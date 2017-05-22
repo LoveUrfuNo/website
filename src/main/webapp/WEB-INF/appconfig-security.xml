@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:b="http://www.springframework.org/schema/beans"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <http auto-config="true">
+        <intercept-url pattern="/" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ANONYMOUS')"/>
+        <intercept-url pattern="/main" access="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_ADMIN')"/>
+        <intercept-url pattern="/options" access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')"/>
+        <intercept-url pattern="/profile" access="hasAnyRole('ROLE_USER', 'ROLE_ADMIN')"/>
+        <intercept-url pattern="/profile/registration" access="hasAnyRole('ROLE_NOT_ACTIVATED_USER', 'ROLE_ADMIN')"/>
+        <intercept-url pattern="/add_service" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')"/>
+        <intercept-url pattern="/show_your_services" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')"/>
+        <intercept-url pattern="/delete" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')"/>
+        <intercept-url pattern="/admin" access="hasRole('ROLE_ADMIN')"/>
+
+        <form-login login-page="/main" default-target-url="/profile" authentication-failure-url="/main?error"
+                    username-parameter="username" password-parameter="password"/>
+        <anonymous username="guest" granted-authority="ROLE_ANONYMOUS"/>
+        <access-denied-handler error-page="/redirect"/>
+        <http-basic/>
+        <logout logout-success-url="/main?logout"/>
+        <remember-me
+                key="myAppKey"
+                user-service-ref="userDetailsServiceImpl"
+                token-repository-ref="tokenRepository"
+                remember-me-cookie="remember-me-cookieName"
+                remember-me-parameter="remember-me-parameter"
+                token-validity-seconds="1800"/>
+        <headers/>
+        <csrf/>
+    </http>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider user-service-ref="userDetailsServiceImpl">
+            <password-encoder ref="encoder"/>
+        </authentication-provider>
+    </authentication-manager>
+
+    <beans:bean id="tokenRepository"
+                class="org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl">
+        <beans:property name="dataSource" ref="dataSource"/>
+    </beans:bean>
+
+    <beans:bean id="userDetailsServiceImpl"
+                class="springbackend.service.implementation.UserDetailsServiceImpl">
+        <beans:property name="enableGroups" value="true"/>
+        <beans:property name="enableAuthorities" value="false"/>
+        <beans:property name="dataSource" ref="dataSource"/>
+    </beans:bean>
+
+    <beans:bean id="encoder"
+                class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
+        <beans:constructor-arg name="strength" value="11"/>
+    </beans:bean>
+</beans:beans>

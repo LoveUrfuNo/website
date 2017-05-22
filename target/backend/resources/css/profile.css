@@ -1,0 +1,28 @@
+body {
+    background: url("../images/background.png") no-repeat;
+    font-family: Verdana sans-serif;
+    font-size: 30px;
+}
+
+.container {
+    display: table;
+    text-align: center;
+    height: 100vh;
+}
+
+.profileInfo {
+    
+}
+
+.sell {
+    border: 1px black solid;
+    border-radius: 10px;
+    margin-top: 2%;
+}
+
+.buy {
+    border: 1px black solid;
+    border-radius: 10px;
+    margin-left: 16%;
+    margin-top: 2%;
+}
