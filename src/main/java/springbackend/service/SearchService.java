@@ -50,10 +50,21 @@ public interface SearchService {
     /**
      * @return
      */
-    TreeSet<String> crateDictionary();
+    void initializeDictionary();
 
     /**
-     * 
+     *
+     * @param dictionary
+     */
+    void saveDictionary(TreeSet<String> dictionary);
+
+    /**
+     *
+     */
+    TreeSet<String> getDictionary();
+
+    /**
+     *
      *
      * @param testString
      * @return

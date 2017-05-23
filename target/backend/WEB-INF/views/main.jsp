@@ -102,6 +102,21 @@
                                                     <form:errors path="searchLine"/>
                                                 </div>
                                             </spring:bind>
+                                            <div id="asd0">
+
+                                            </div>
+                                            <div id="asd1">
+
+                                            </div>
+                                            <div id="asd2">
+
+                                            </div>
+                                            <div id="asd3">
+
+                                            </div>
+                                            <div id="asd4">
+
+                                            </div>
                                             <input type="submit" class="ui green button" value="Найти">
                                         </form:form>
                                     </div>

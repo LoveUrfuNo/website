@@ -47,10 +47,10 @@ public class SearchController {
                 .getStringsForAutoComplete(searchRequest);
 
         if (resultArray.isEmpty()) {
-            SearchRequest editedSearchrequest
+            SearchRequest editedSearchRequest
                     = this.searchService.getEditedSearchRequest(searchRequest);
             resultArray = this.searchService
-                    .getStringsForAutoComplete(editedSearchrequest);
+                    .getStringsForAutoComplete(editedSearchRequest);
         }
 
         return resultArray;

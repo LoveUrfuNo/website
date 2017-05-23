@@ -99,7 +99,6 @@
             horizontalScrolling: false,
             hideDistantElements: false,
             responsive: true
-
         });
     };
 
@@ -224,7 +223,6 @@
             xhr.send();
             xhr.onreadystatechange = function () {
                 var data = this.responseText.replace(/["|[|\]]/g, '').split(',');
-                //alert(data[0]);
                 var availableTags = [
                     data[0],
                     data[1],
@@ -233,9 +231,15 @@
                     data[4]
                 ];
 
+                /*availableTags.forEach(function (item, i, arr) {
+                    if (item !== null) {
+                        document.getElementById('asd' + i).innerHTML = item;
+                    }
+                });*/
+
                 $("#tags").autocomplete({
-                    source: availableTags
-                });
+                 source: availableTags
+                 });
             };
         };
     };

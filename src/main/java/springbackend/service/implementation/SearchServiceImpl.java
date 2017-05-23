@@ -67,6 +67,11 @@ public class SearchServiceImpl implements SearchService {
     @Autowired
     private MetricService metricService;   //TODO: try with stream
 
+    /**
+     * Set with words form all services in the base.
+     */
+    private TreeSet<String> dictionary = new TreeSet<>();
+
     private static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
 
     private static final String REGEX_FOR_REPLACE = "[^а-я\\w-][\\s]{2,}";
@@ -77,23 +82,23 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) {
-        /* Set with words form all services in the base. */
-        TreeSet<String> dictionary = searchService.crateDictionary();   //TODO: make the only one for the whole class
-
         SearchRequest result = new SearchRequest();
         StringBuilder newSearchLine = new StringBuilder();
         String[] wordsFromRequest = sourceSearchRequest.getSearchLine()
                 .replaceAll(REGEX_FOR_REPLACE, "")
                 .split(REGEX_FOR_SPLIT);
 
+        if (dictionary.isEmpty())
+            this.searchService.initializeDictionary();
+
         ExactOccerencesInTree occerences = TreeSet::contains;
         Arrays.stream(wordsFromRequest).forEach(requestWord -> {
-            if (occerences.isWordIncludingInTree(dictionary, requestWord)) {
+            if (occerences.isWordIncludingInTree(this.dictionary, requestWord)) {
                 newSearchLine.append(requestWord);
             } else {
                 String oppositeWord
                         = this.searchService.getStringByOppositeKeyboardLayout(requestWord);
-                if (occerences.isWordIncludingInTree(dictionary, oppositeWord)) {
+                if (occerences.isWordIncludingInTree(this.dictionary, oppositeWord)) {
                     newSearchLine.append(oppositeWord);
                 } else {
                     newSearchLine.append(requestWord);
@@ -220,20 +225,20 @@ public class SearchServiceImpl implements SearchService {
     public Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) {
         String searchLine = searchRequest.getSearchLine();
 
-        /* Set with words form all services in the base. */
-        TreeSet<String> dictionary = searchService.crateDictionary();   //TODO: make the only one for the whole class
-
         /* Map with words from request and with pair consisting distance & word from dictionary. */
         Map<String, HashMap<String, Integer>> resultMap = new TreeMap<>(Comparator.naturalOrder());
 
         Distance distance = (dictString, userString) ->
                 this.metricService.getPrefixDistance(dictString, userString, 8);
 
+        if (dictionary.isEmpty())
+            this.searchService.initializeDictionary();
+
         String[] wordsFromSearchQuery = searchLine.split(REGEX_FOR_SPLIT);
         Arrays.stream(wordsFromSearchQuery)
                 .forEach(requestWord -> {
                     HashMap<String, Integer> wordsWithDistance = new HashMap<>();
-                    dictionary.forEach(dictWord ->
+                    this.dictionary.forEach(dictWord ->
                             wordsWithDistance.put(
                                     dictWord,
                                     distance.getDistance(dictWord, requestWord))
@@ -275,27 +280,34 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public TreeSet<String> crateDictionary() {
-        TreeSet<String> result = new TreeSet<>(String::compareToIgnoreCase);
-
+    public void initializeDictionary() {
         Set<Service> allServiceSet = this.serviceForService.findAll();
         allServiceSet.forEach(service -> {
             String[] texts = new String[]{
                     service.getNameOfService(), service.getDescription()};
             Arrays.stream(texts).forEach(text ->
-                    result.addAll(Arrays.stream(text.toLowerCase().split(REGEX_FOR_SPLIT))
+                    this.dictionary.addAll(Arrays.stream(text.toLowerCase().split(REGEX_FOR_SPLIT))
                             .filter(word ->
                                     this.searchService.isStringSuitableForDictionary(word))
                             .collect(Collectors.toSet())));
         });
-
-        return result;
     }                  //TODO: add save and load dictionary and fixed multiple creation with autocomplete (maybe make 2 dictionaries)
 
     @Override
+    public void saveDictionary(TreeSet<String> dictionary) {        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! make personal class for dictionary 
+
+    }
+
+    @Override
+    public TreeSet<String> getDictionary() {
+        return null;
+    }
+
+    @Override
     public boolean isStringSuitableForDictionary(String testString) {
-        Pattern p = Pattern.compile("^[а-яa-z]{3,}+$");
+        Pattern p = Pattern.compile("^[а-яa-z]{3,50}+$");
         Matcher m = p.matcher(testString);
+
         return m.matches();
     }
 }
