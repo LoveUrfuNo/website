@@ -1,7 +1,12 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.model;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
+
 import java.util.Date;
 
 /**

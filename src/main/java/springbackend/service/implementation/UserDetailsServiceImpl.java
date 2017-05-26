@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,14 +12,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.Errors;
-import springbackend.dao.UserDao;
+
 import springbackend.model.Role;
 import springbackend.model.User;
 import springbackend.service.UserService;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 /**

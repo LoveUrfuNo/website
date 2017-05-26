@@ -1,3 +1,7 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.validator;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -5,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
 import springbackend.model.User;
 import springbackend.service.UserService;
 

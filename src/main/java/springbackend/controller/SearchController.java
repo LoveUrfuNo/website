@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
- * TODO: add
+ * Copyright (C) 2017 The Open Source Project
  */
 
 package springbackend.controller;
@@ -67,14 +66,17 @@ public class SearchController {
         }
 
         try {
-            String sourceSearchLineWithoutMultipleSpaces = searchRequest.getSearchLine().replaceAll(REGEX_FOR_REPLACE, " ");
+            String sourceSearchLineWithoutMultipleSpaces
+                    = searchRequest.getSearchLine().replaceAll(REGEX_FOR_REPLACE, " ");
             String decodedSearchLine = new String(
-                    sourceSearchLineWithoutMultipleSpaces.getBytes("ISO-8859-1"), "UTF-8");
+                    sourceSearchLineWithoutMultipleSpaces.getBytes("ISO-8859-1"),
+                    "UTF-8");
 
             searchRequest.setSearchLine(decodedSearchLine.toLowerCase());
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             model.addAttribute("error_in_site_search", "vvedite drugoe plz");  //TODO: add in jsp
+
             return "redirect";
         }
 
@@ -93,14 +95,16 @@ public class SearchController {
 
             String alternativeSearchLine = this.searchService.getAlternativeSearchLine(
                     wordsWithDistance, editedSearchRequest);
-            if (alternativeSearchLine.equalsIgnoreCase(editedSearchRequest.getSearchLine())) {
+            if (alternativeSearchLine.equalsIgnoreCase(editedSearchRequest.getSearchLine())) {   //TODO: move this block of code to SearchService
                 model.addAttribute("did_you_meant_it", null);
             } else {
                 model.addAttribute("did_you_meant_it", alternativeSearchLine);
             }
         } else {
-            model.addAttribute("results_of_the_request_are_shown", editedSearchRequest.getSearchLine());
-            model.addAttribute("search_instead_this", searchRequest.getSearchLine());
+            model.addAttribute("results_of_the_request_are_shown",
+                    editedSearchRequest.getSearchLine());
+            model.addAttribute("search_instead_this",
+                    searchRequest.getSearchLine());
         }
 
         model.addAttribute("search_results", finalSearchResults);

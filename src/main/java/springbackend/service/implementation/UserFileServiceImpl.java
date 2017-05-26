@@ -1,14 +1,18 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.service.implementation;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import springbackend.dao.UserFileDao;
 import springbackend.model.UserFile;
 import springbackend.service.UserFileService;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link springbackend.service.UserFileService} interface.

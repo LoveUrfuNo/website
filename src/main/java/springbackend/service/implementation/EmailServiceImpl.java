@@ -1,17 +1,21 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.service.implementation;
 
 import org.apache.velocity.app.VelocityEngine;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.velocity.VelocityEngineUtils;
+
 import springbackend.service.EmailService;
 
-import javax.mail.internet.MimeMessage;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 

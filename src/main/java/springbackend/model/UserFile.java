@@ -1,7 +1,10 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.model;
 
 import javax.persistence.*;
-import java.util.Set;
 
 /**
  * Simple JavaBean domain object that represents user's file for his service description (photo or video).

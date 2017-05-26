@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
- * //TODO: add
+ * Copyright (C) 2017 The Open Source Project
  */
 
 package springbackend.controller;
@@ -40,7 +39,8 @@ public class FileController {
     @Autowired
     private StringService stringService;
 
-    private static final String rootPath = "C:\\Users\\kosty\\IntellijProjects\\Deal\\backend\\src\\main\\webapp\\resources\\user's\\";
+    private static final String rootPath =
+            "C:\\Users\\kosty\\IntellijProjects\\Deal\\backend\\src\\main\\webapp\\resources\\user's\\";
 
     private static final Long ROLE_USER = 1L;
 

@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
- * //TODO: add
+ * Copyright (C) 2017 The Open Source Project
  */
 
 package springbackend.service.implementation;
@@ -65,7 +64,7 @@ public class SearchServiceImpl implements SearchService {
     private SearchService searchService;
 
     @Autowired
-    private MetricService metricService;   //TODO: try with stream
+    private MetricService metricService;                      //TODO: try with stream
 
     /**
      * Set with words form all services in the base.
@@ -108,7 +107,7 @@ public class SearchServiceImpl implements SearchService {
             newSearchLine.append(' ');
         });
 
-        newSearchLine.deleteCharAt(newSearchLine.length() - 1);  //delete last space
+        newSearchLine.deleteCharAt(newSearchLine.length() - 1);  //deletes last space
         result.setSearchLine(newSearchLine.toString());
 
         return result;
@@ -159,7 +158,7 @@ public class SearchServiceImpl implements SearchService {
                 .collect(Collectors.toSet()));
 
         return searchResults;
-    }
+    }    //TODO: add category in jsp
 
     @Override
     public ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest) {
@@ -291,12 +290,12 @@ public class SearchServiceImpl implements SearchService {
                                     this.searchService.isStringSuitableForDictionary(word))
                             .collect(Collectors.toSet())));
         });
-    }                  //TODO: add save and load dictionary and fixed multiple creation with autocomplete (maybe make 2 dictionaries)
+    }
 
     @Override
-    public void saveDictionary(TreeSet<String> dictionary) {        //TODO: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! make personal class for dictionary 
+    public void saveDictionary(TreeSet<String> dictionary) {
 
-    }
+    }      //TODO: make personal class for dictionary and need to serialize
 
     @Override
     public TreeSet<String> getDictionary() {

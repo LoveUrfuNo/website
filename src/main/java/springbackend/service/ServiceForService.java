@@ -1,10 +1,11 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.service;
 
 import springbackend.model.Service;
-import springbackend.model.User;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 /**

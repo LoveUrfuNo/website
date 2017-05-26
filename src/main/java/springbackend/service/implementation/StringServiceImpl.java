@@ -1,6 +1,11 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
+
 package springbackend.service.implementation;
 
 import org.springframework.stereotype.Service;
+
 import springbackend.service.StringService;
 
 import java.io.UnsupportedEncodingException;

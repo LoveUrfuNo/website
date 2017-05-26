@@ -1,6 +1,5 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
- * //TODO: add
+ * Copyright (C) 2017 The Open Source Project
  */
 
 package springbackend.controller;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import springbackend.model.SearchRequest;
 import springbackend.model.ServiceEntrance;
 import springbackend.model.User;
-
 
 /**
  * Controller for {@link springbackend.model.ServiceEntrance}'s page.

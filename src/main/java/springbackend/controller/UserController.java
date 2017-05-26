@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2010 The Android Open Source Project
- * //TODO: add
+ * Copyright (C) 2017 The Open Source Project
  */
 
 package springbackend.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+
 import springbackend.model.SearchRequest;
 import springbackend.model.UserFormForTechnicalSupport;
 import springbackend.service.StringService;
@@ -200,14 +201,15 @@ public class UserController {
         Map map = new HashMap();
         map.put("from", "DEAL");
         map.put("subject", "Hello from " + user.getLogin() + "!");
-        map.put("to", user.getUsername());      //TODO: rename field "username" to "email"
+        map.put("to", user.getUsername());
         map.put("key_for_registration_confirm_url", user.getKeyForRegistrationConfirmUrl());
         map.put("id", user.getId());
 
         if (this.emailService.sendEmail(MESSAGE_TO_CONFIRM_REGISTRATION, map)) {      //TODO: add output in logger
             System.out.println("Message was sent");
         } else {
-            System.out.println("Error: message wasn't sent");
+            logger.debug(String.format("Error: message wasn't sent to \"%s\"", map.get("to")));
+            System.out.println("");
         }
 
         return "redirect:/profile/registration";
