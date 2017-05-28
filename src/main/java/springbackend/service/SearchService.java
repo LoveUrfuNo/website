@@ -4,9 +4,11 @@
 
 package springbackend.service;
 
-import springbackend.model.SearchRequest;
-import springbackend.model.Service;
+import springbackend.model.*;
+import springbackend.model.Dictionary;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -16,7 +18,7 @@ public interface SearchService {
     /**
      *
      */
-    SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest);
+    SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) throws IOException;
 
     /**
      * Search for exact occurrences.
@@ -28,7 +30,7 @@ public interface SearchService {
     /**
      *
      */
-    ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest);
+    ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest) throws IOException;
 
     /**
      * @return
@@ -39,7 +41,7 @@ public interface SearchService {
     /**
      *
      */
-    Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest);
+    Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) throws IOException;
 
     /**
      * @return
@@ -49,18 +51,17 @@ public interface SearchService {
     /**
      * @return
      */
-    void initializeDictionary();
-
-    /**
-     *
-     * @param dictionary
-     */
-    void saveDictionary(TreeSet<String> dictionary);
+    void initializeDictionary(Dictionary dictionary);
 
     /**
      *
      */
-    TreeSet<String> getDictionary();
+    void saveDictionary(Dictionary dictionary) throws IOException;
+
+    /**
+     *
+     */
+    Dictionary getDictionary() throws IOException;
 
     /**
      *

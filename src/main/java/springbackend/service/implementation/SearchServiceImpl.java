@@ -4,14 +4,17 @@
 
 package springbackend.service.implementation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import springbackend.model.SearchRequest;
-import springbackend.model.Service;
+import springbackend.model.*;
+import springbackend.model.Dictionary;
 import springbackend.service.MetricService;
 import springbackend.service.SearchService;
 import springbackend.service.ServiceForService;
 
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,14 +42,14 @@ public class SearchServiceImpl implements SearchService {
     /**
      *
      */
-    interface ExactOccerencesInText {
+    interface ExactOccurrencesInText {
         Boolean isWordIncludingInText(String text);            //TODO: rename
     }
 
     /**
      *
      */
-    interface ExactOccerencesInTree {
+    interface ExactOccurrencesInTree {
         Boolean isWordIncludingInTree(TreeSet<String> tree, String word);
     }
 
@@ -61,15 +64,17 @@ public class SearchServiceImpl implements SearchService {
     private ServiceForService serviceForService;
 
     @Autowired
-    private SearchService searchService;
+    private SearchService searchService;         //TODO: remove
 
     @Autowired
     private MetricService metricService;                      //TODO: try with stream
 
     /**
-     * Set with words form all services in the base.
+     * Set with words from all services in the base.
      */
-    private TreeSet<String> dictionary = new TreeSet<>();
+    private Dictionary dictionary = new Dictionary();
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
     private static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
 
@@ -79,25 +84,29 @@ public class SearchServiceImpl implements SearchService {
 
     private static final String LATIN_LAYOUT = "qwertyuiop[]asdfghjkl;'zxcvbnm,./QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./";
 
+    private static final String DICTIONARY_FILE_NAME = "dictionary.dat";
+
     @Override
-    public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) {
+    public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) throws IOException {
         SearchRequest result = new SearchRequest();
         StringBuilder newSearchLine = new StringBuilder();
         String[] wordsFromRequest = sourceSearchRequest.getSearchLine()
                 .replaceAll(REGEX_FOR_REPLACE, "")
                 .split(REGEX_FOR_SPLIT);
 
-        if (dictionary.isEmpty())
-            this.searchService.initializeDictionary();
+        if (dictionary.getDictionaryContent().isEmpty())
+            this.dictionary = getDictionary();
 
-        ExactOccerencesInTree occerences = TreeSet::contains;
+        ExactOccurrencesInTree occurrences = TreeSet::contains;
         Arrays.stream(wordsFromRequest).forEach(requestWord -> {
-            if (occerences.isWordIncludingInTree(this.dictionary, requestWord)) {
+            TreeSet<String> dictionaryContent = this.dictionary.getDictionaryContent();
+
+            if (occurrences.isWordIncludingInTree(dictionaryContent, requestWord)) {
                 newSearchLine.append(requestWord);
             } else {
                 String oppositeWord
                         = this.searchService.getStringByOppositeKeyboardLayout(requestWord);
-                if (occerences.isWordIncludingInTree(this.dictionary, oppositeWord)) {
+                if (occurrences.isWordIncludingInTree(dictionaryContent, oppositeWord)) {
                     newSearchLine.append(oppositeWord);
                 } else {
                     newSearchLine.append(requestWord);
@@ -136,7 +145,7 @@ public class SearchServiceImpl implements SearchService {
         };
 
         String[] searchLineWords = searchLine.split(REGEX_FOR_SPLIT);
-        ExactOccerencesInText checking = (string) -> Arrays.stream(searchLineWords)
+        ExactOccurrencesInText checking = (string) -> Arrays.stream(searchLineWords)
                 .allMatch(searchWord -> arrayList.getArrayFromTexts(string, "")
                         .contains(searchWord));
 
@@ -161,7 +170,7 @@ public class SearchServiceImpl implements SearchService {
     }    //TODO: add category in jsp
 
     @Override
-    public ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest) {
+    public ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest) throws IOException {
         ArrayList<String> result = new ArrayList<>();
 
         Map<String, HashMap<String, Integer>> wordsWithDistance
@@ -171,7 +180,6 @@ public class SearchServiceImpl implements SearchService {
             String alternativeSearchLine = this.searchService.getAlternativeSearchLine(        //TODO: add check language of alternativeSearchLine and searchLine
                     wordsWithDistance,
                     searchRequest);
-
             result.add(alternativeSearchLine);
 
             /* Delete words from "wordsWithDistance.value" which are equal to some word from alternativeSearchLine */
@@ -221,27 +229,33 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) {
+    public Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) throws IOException {
         String searchLine = searchRequest.getSearchLine();
 
-        /* Map with words from request and with pair consisting distance & word from dictionary. */
+        /* Map with words from request and with pair consisting distance and word from dictionary. */
         Map<String, HashMap<String, Integer>> resultMap = new TreeMap<>(Comparator.naturalOrder());
 
         Distance distance = (dictString, userString) ->
                 this.metricService.getPrefixDistance(dictString, userString, 8);
 
-        if (dictionary.isEmpty())
-            this.searchService.initializeDictionary();
+        if (this.dictionary.getDictionaryContent() == null) {
+            this.dictionary = getDictionary();
+
+            if (this.dictionary.getDictionaryContent() == null) {
+                this.searchService.initializeDictionary(dictionary);
+                this.searchService.saveDictionary(dictionary);
+                this.dictionary = getDictionary();
+            }
+        }
 
         String[] wordsFromSearchQuery = searchLine.split(REGEX_FOR_SPLIT);
         Arrays.stream(wordsFromSearchQuery)
                 .forEach(requestWord -> {
                     HashMap<String, Integer> wordsWithDistance = new HashMap<>();
-                    this.dictionary.forEach(dictWord ->
+                    this.dictionary.getDictionaryContent().forEach(dictWord ->
                             wordsWithDistance.put(
                                     dictWord,
-                                    distance.getDistance(dictWord, requestWord))
-                    );
+                                    distance.getDistance(dictWord, requestWord)));
 
                     resultMap.put(requestWord, wordsWithDistance);
                 });
@@ -279,27 +293,45 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public void initializeDictionary() {
+    public void initializeDictionary(Dictionary dictionary) {
+        TreeSet<String> resultDictionaryContent = new TreeSet<>();
+
         Set<Service> allServiceSet = this.serviceForService.findAll();
         allServiceSet.forEach(service -> {
             String[] texts = new String[]{
                     service.getNameOfService(), service.getDescription()};
+
             Arrays.stream(texts).forEach(text ->
-                    this.dictionary.addAll(Arrays.stream(text.toLowerCase().split(REGEX_FOR_SPLIT))
-                            .filter(word ->
-                                    this.searchService.isStringSuitableForDictionary(word))
-                            .collect(Collectors.toSet())));
+                resultDictionaryContent.addAll(Arrays.stream(
+                        text.toLowerCase().split(REGEX_FOR_SPLIT))
+                        .filter(word -> this.searchService.isStringSuitableForDictionary(word))
+                        .collect(Collectors.toSet())));
         });
+
+        dictionary.setDictionaryContent(resultDictionaryContent);
     }
 
     @Override
-    public void saveDictionary(TreeSet<String> dictionary) {
+    public void saveDictionary(Dictionary dictionary) throws IOException {
+        ObjectOutput objectOutput = new ObjectOutputStream(new FileOutputStream(DICTIONARY_FILE_NAME));
+        objectOutput.writeObject(dictionary);
+        objectOutput.flush();
+        objectOutput.close();
 
-    }      //TODO: make personal class for dictionary and need to serialize
+        this.dictionary.setDictionaryContent(null);
+    }
 
     @Override
-    public TreeSet<String> getDictionary() {
-        return null;
+    public Dictionary getDictionary() throws IOException {
+        Dictionary resultDictionary = null;
+        try (ObjectInput objectInput = new ObjectInputStream(new FileInputStream(DICTIONARY_FILE_NAME))) {
+            resultDictionary = (Dictionary) objectInput.readObject();
+        } catch (ClassNotFoundException e) {
+            logger.debug("Error: " + e.getMessage() + " by deserialization");
+            e.printStackTrace();
+        }
+
+        return resultDictionary;
     }
 
     @Override

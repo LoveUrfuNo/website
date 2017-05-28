@@ -30,6 +30,7 @@ import springbackend.validator.UserOptionsValidator;
 import springbackend.validator.UserValidator;
 
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -205,11 +206,12 @@ public class UserController {
         map.put("key_for_registration_confirm_url", user.getKeyForRegistrationConfirmUrl());
         map.put("id", user.getId());
 
-        if (this.emailService.sendEmail(MESSAGE_TO_CONFIRM_REGISTRATION, map)) {      //TODO: add output in logger
-            System.out.println("Message was sent");
-        } else {
-            logger.debug(String.format("Error: message wasn't sent to \"%s\"", map.get("to")));
-            System.out.println("");
+        if (!this.emailService.sendEmail(MESSAGE_TO_CONFIRM_REGISTRATION, map)) {
+            Date date = new Date();
+            SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy hh:mm");
+
+            logger.debug(String.format("Error: message wasn't sent to \"%s\", current time: %s",
+                    map.get("to"), format.format(date)));
         }
 
         return "redirect:/profile/registration";

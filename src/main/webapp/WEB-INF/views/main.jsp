@@ -818,12 +818,6 @@
                         <p>Использование сайта, в том числе подача объявлений, означает согласие с пользовательским
                             соглашением.
                             Оплачивая услуги на сайте, вы принимаете оферту <a href="#">Deal</a>. Все права защищены.
-                            <br>Сделано
-                            с <i class="icon-heart3 love"></i> by <a href="#" target="_blank">Deal</a><br> Создатели <a
-                                    href="https://vk.com/id35713161" target="_blank">Никита</a> &amp; <a
-                                    href="https://vk.com/yurok_e" target="_blank">Юрий</a> &amp; <a
-                                    href="https://vk.com/id153656293" target="_blank">Максим</a> &amp; <a
-                                    href="https://vk.com/id352078925" target="_blank">Андрей</a></p>
                         <p class="fh5co-social-icons">
                             <a href="#"><i class="icon-twitter-with-circle"></i></a>
                             <a href="#"><i class="icon-facebook-with-circle"></i></a>

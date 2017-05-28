@@ -12,12 +12,12 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import springbackend.model.Service;
-import springbackend.model.User;
-import springbackend.model.UserFile;
+import springbackend.model.*;
+import springbackend.model.Dictionary;
 import springbackend.service.*;
 import springbackend.validator.ServiceValidator;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.*;
 
@@ -40,6 +40,9 @@ public class ServiceController {
 
     @Autowired
     private UserFileService userFileService;
+
+    @Autowired
+    private SearchService searchService;
 
     @RequestMapping(value = "/add_service", method = RequestMethod.GET)
     public String addService(Model model) {
@@ -64,11 +67,19 @@ public class ServiceController {
         try {
             service.setNameOfService(stringService.decoding(service.getNameOfService()));
             service.setDescription(stringService.decoding(service.getDescription()));
-
             this.serviceForService.save(service);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return "error-page";
+        }
+
+        try {
+            Dictionary dictionary = new Dictionary();
+            this.searchService.initializeDictionary(dictionary);
+            this.searchService.saveDictionary(dictionary);
+        } catch (IOException e) {
+            e.printStackTrace();
+            //TODO: add
         }
 
         return "redirect";

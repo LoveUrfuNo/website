@@ -4,7 +4,11 @@
 
 package springbackend.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -16,7 +20,9 @@ import springbackend.model.User;
 import springbackend.service.SearchService;
 import springbackend.validator.SearchValidator;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -30,9 +36,16 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
+    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
+
     private static final String REGEX_FOR_REPLACE = "[^а-я\\w-][\\s]{2,}";   //TODO: try to import from SearchServiceImpl
 
     private static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
+
+    private static final String ERROR_BY_AUTO_COMPLETE = "Error: %s. Can't get array of strings with auto complete variants from" +
+            " this.searchService.getStringsForAutoComplete by request: \"%s\"";
+
+    private static final String ERROR_BY_DECODING_STRING = "Error: %s. From \"%s\"";
 
     @ResponseBody
     @RequestMapping(value = "/auto_complete/{request}", method = RequestMethod.GET)
@@ -42,14 +55,27 @@ public class SearchController {
         currentRequest = currentRequest.trim();
         searchRequest.setSearchLine(currentRequest);
 
-        ArrayList<String> resultArray = this.searchService
-                .getStringsForAutoComplete(searchRequest);
+        ArrayList<String> resultArray = null;
+        try {
+            resultArray = this.searchService
+                    .getStringsForAutoComplete(searchRequest);
+        } catch (IOException e) {
+            logger.debug(String.format(
+                    ERROR_BY_AUTO_COMPLETE, e.getMessage(), searchRequest.getSearchLine()));
+            e.printStackTrace();
+        }
 
         if (resultArray.isEmpty()) {
-            SearchRequest editedSearchRequest
-                    = this.searchService.getEditedSearchRequest(searchRequest);
-            resultArray = this.searchService
-                    .getStringsForAutoComplete(editedSearchRequest);
+            SearchRequest editedSearchRequest;
+            try {
+                editedSearchRequest = this.searchService.getEditedSearchRequest(searchRequest);
+                resultArray = this.searchService
+                        .getStringsForAutoComplete(editedSearchRequest);
+            } catch (IOException e) {
+                logger.debug(String.format(
+                        ERROR_BY_AUTO_COMPLETE, e.getMessage(), searchRequest.getSearchLine()));
+                e.printStackTrace();
+            }
         }
 
         return resultArray;
@@ -74,14 +100,26 @@ public class SearchController {
 
             searchRequest.setSearchLine(decodedSearchLine.toLowerCase());
         } catch (UnsupportedEncodingException e) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            logger.debug(String.format(ERROR_BY_DECODING_STRING, e.getMessage(), auth.getName()));
             e.printStackTrace();
-            model.addAttribute("error_in_site_search", "vvedite drugoe plz");  //TODO: add in jsp
+
+            model.addAttribute("error_in_site_search", "vvedite drugoe plz");         //TODO: add in jsp
 
             return "redirect";
         }
 
-        SearchRequest editedSearchRequest
-                = this.searchService.getEditedSearchRequest(searchRequest);
+        SearchRequest editedSearchRequest;
+        try {
+            editedSearchRequest = this.searchService.getEditedSearchRequest(searchRequest);
+        } catch (IOException e) {
+            logger.debug(String.format(
+                    ERROR_BY_AUTO_COMPLETE, e.getMessage(), searchRequest.getSearchLine()));
+            e.printStackTrace();
+
+            return "redirect";  //TODO: add correct redirect
+        }
+
         TreeSet<Service> finalSearchResults
                 = this.searchService.getResultServiceSet(editedSearchRequest);
 
@@ -89,9 +127,18 @@ public class SearchController {
                 Arrays.equals(
                         editedSearchRequest.getSearchLine().split(REGEX_FOR_SPLIT),
                         searchRequest.getSearchLine().split(REGEX_FOR_SPLIT));
+
         if (isNewSearchRequestEqualOriginal) {
-            Map<String, HashMap<String, Integer>> wordsWithDistance
-                    = this.searchService.getWordsWithMinimumDistance(editedSearchRequest);
+            Map<String, HashMap<String, Integer>> wordsWithDistance;
+            try {
+                wordsWithDistance = this.searchService.getWordsWithMinimumDistance(editedSearchRequest);
+            } catch (IOException e) {
+                logger.debug("Error: " + e.getMessage() +
+                        ". Can't get wordsWithDistance from this.searchService.getWordsWithMinimumDistance");
+                e.printStackTrace();
+
+                return "redirect";     //TODO: add correct return
+            }
 
             String alternativeSearchLine = this.searchService.getAlternativeSearchLine(
                     wordsWithDistance, editedSearchRequest);
