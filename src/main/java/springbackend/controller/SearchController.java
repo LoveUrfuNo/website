@@ -42,10 +42,22 @@ public class SearchController {
 
     private static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
 
-    private static final String ERROR_BY_AUTO_COMPLETE = "Error: %s. Can't get array of strings with auto complete variants from" +
+    private static final String ERROR_BY_AUTO_COMPLETE
+            = "Error: %s. Can't get array of strings with auto complete variants from" +
             " this.searchService.getStringsForAutoComplete by request: \"%s\"";
 
     private static final String ERROR_BY_DECODING_STRING = "Error: %s. From \"%s\"";
+
+    private static final String ERROR_BY_Get_WORDS_WITH_DISTANCE = "Error: %s." +
+            " Can't get wordsWithDistance from this.searchService.getWordsWithMinimumDistance";
+
+    private static final String DID_YOU_MEANT_IT = "did_you_meant_it";
+
+    private static final String SEARCH_RESULTS = "search_results";
+
+    private static final String SEARCH_INSTEAD_THIS = "search_instead_this";
+
+    private static final String RESULTS_FOR = "results_of_the_request_are_shown";
 
     @ResponseBody
     @RequestMapping(value = "/auto_complete/{request}", method = RequestMethod.GET)
@@ -132,8 +144,7 @@ public class SearchController {
             try {
                 wordsWithDistance = this.searchService.getWordsWithMinimumDistance(editedSearchRequest);
             } catch (IOException e) {
-                logger.debug("Error: " + e.getMessage() +
-                        ". Can't get wordsWithDistance from this.searchService.getWordsWithMinimumDistance");
+                logger.debug(String.format(ERROR_BY_Get_WORDS_WITH_DISTANCE, e.getMessage()));
                 e.printStackTrace();
 
                 return "redirect";     //TODO: add message in jsp with information about error
@@ -144,22 +155,20 @@ public class SearchController {
 
             boolean isAlternativeSearchLineNeeded
                     = alternativeSearchLine.equalsIgnoreCase(editedSearchRequest.getSearchLine())
-                    || this.searchService.isThereEnoughOfALotServicesFoundForAlternativeSearchLine(
+                    || this.searchService.isAlternativeSearchLineNeeded(
                             finalSearchResults.size(), searchRequest.getCategory());
 
             if (isAlternativeSearchLineNeeded) {
-                model.addAttribute("did_you_meant_it", alternativeSearchLine);
+                model.addAttribute(DID_YOU_MEANT_IT, alternativeSearchLine);
             } else {
-                model.addAttribute("did_you_meant_it", null);
+                model.addAttribute(DID_YOU_MEANT_IT, null);
             }
         } else {
-            model.addAttribute("results_of_the_request_are_shown",
-                    editedSearchRequest.getSearchLine());
-            model.addAttribute("search_instead_this",
-                    searchRequest.getSearchLine());
+            model.addAttribute(RESULTS_FOR, editedSearchRequest.getSearchLine());
+            model.addAttribute(SEARCH_INSTEAD_THIS, searchRequest.getSearchLine());
         }
 
-        model.addAttribute("search_results", finalSearchResults);
+        model.addAttribute(SEARCH_RESULTS, finalSearchResults);
 
         return "searching-results";
     }

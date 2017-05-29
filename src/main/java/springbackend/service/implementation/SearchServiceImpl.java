@@ -75,6 +75,8 @@ public class SearchServiceImpl implements SearchService {
 
     private static final String REGEX_FOR_REPLACE = "[^а-я\\w-][\\s]{2,}";
 
+    private static final String REGEX_FOR_VERIFYING_WORD_FOR_THE_DICTIONARY = "^[а-яa-z]{3,50}+$";
+
     private static final String CYRILLIC_LAYOUT = "йцукенгшщзхъфывапролджэячсмитьбюЙЦУКЕНГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ";
 
     private static final String LATIN_LAYOUT = "qwertyuiop[]asdfghjkl;'zxcvbnm,./QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./";
@@ -87,7 +89,7 @@ public class SearchServiceImpl implements SearchService {
 
     private static final int NUMBER_OF_SERVICES_CATEGORY = 3;
 
-    private static final int MINIMUM_SIZE_OF_FOUND_SERVICES_FOR_GET_ALTERNATIVE_SEARCH_LINE = 5;
+    private static final int MINIMUM_SIZE_OF_FOUND_SERVICES = 5;
 
     @Override
     public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) throws IOException {
@@ -168,7 +170,7 @@ public class SearchServiceImpl implements SearchService {
                                     .contains(word.toLowerCase()) && isServiceCategorySuitable);
                 }).collect(Collectors.toSet()));
 
-        this.numberOFAllServices = searchResults.size();   // for isThereEnoughOfALotServicesFoundForAlternativeSearchLine(...)
+        this.numberOFAllServices = searchResults.size();   // for isAlternativeSearchLineNeeded(...)
 
         return searchResults;
     }
@@ -181,7 +183,7 @@ public class SearchServiceImpl implements SearchService {
                 = getWordsWithMinimumDistance(searchRequest);
 
         for (int i = 0; i < 5; i++) {
-            String alternativeSearchLine = getAlternativeSearchLine(        //TODO: add check language of alternativeSearchLine and searchLine
+            String alternativeSearchLine = getAlternativeSearchLine(
                     wordsWithDistance,
                     searchRequest);
             result.add(alternativeSearchLine);
@@ -210,8 +212,7 @@ public class SearchServiceImpl implements SearchService {
         Map<String, Integer> minDistanceMap = new HashMap<>();    //string - requestWord , Integer - distance
 
         Arrays.stream(wordsFromRequest).forEach(requestWord ->
-                minDistanceMap.put(
-                        requestWord,
+                minDistanceMap.put(requestWord,
                         wordsWithDistance.get(requestWord).values()
                                 .stream().min(Comparator.naturalOrder())
                                 .orElse(-1)));
@@ -219,8 +220,7 @@ public class SearchServiceImpl implements SearchService {
         Arrays.stream(wordsFromRequest).forEach(requestWord -> {
             result.append(
                     wordsWithDistance.get(requestWord).entrySet().stream()
-                            .filter(pair ->
-                                    pair.getValue()
+                            .filter(pair -> pair.getValue()
                                             .equals(minDistanceMap.get(requestWord)))
                             .findAny().get().getKey());
 
@@ -233,14 +233,17 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public boolean isThereEnoughOfALotServicesFoundForAlternativeSearchLine(long numberOfFoundServices, String category) {
-        if (numberOfFoundServices <= MINIMUM_SIZE_OF_FOUND_SERVICES_FOR_GET_ALTERNATIVE_SEARCH_LINE) {
-            return true;
+    public boolean isAlternativeSearchLineNeeded(long numberOfFoundServices, String category) {
+        boolean result;
+        if (numberOfFoundServices <= MINIMUM_SIZE_OF_FOUND_SERVICES) {
+            result = true;
         } else if (category.equals(CATEGORY_TYPE_ALL)) {
-            return numberOfFoundServices <= this.numberOFAllServices / 50;
+            result =  numberOfFoundServices <= this.numberOFAllServices / 50;
         } else {
-            return numberOfFoundServices <= this.numberOFAllServices / 50 * NUMBER_OF_SERVICES_CATEGORY;
+            result = numberOfFoundServices <= this.numberOFAllServices / 50 * NUMBER_OF_SERVICES_CATEGORY;
         }
+
+        return result;
     }
 
     @Override
@@ -350,7 +353,7 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public boolean isStringSuitableForDictionary(String testString) {
-        Pattern p = Pattern.compile("^[а-яa-z]{3,50}+$");
+        Pattern p = Pattern.compile(REGEX_FOR_VERIFYING_WORD_FOR_THE_DICTIONARY);
         Matcher m = p.matcher(testString);
 
         return m.matches();
