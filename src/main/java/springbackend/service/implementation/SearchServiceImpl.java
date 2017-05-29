@@ -42,13 +42,6 @@ public class SearchServiceImpl implements SearchService {
     /**
      *
      */
-    interface ExactOccurrencesInText {
-        Boolean isWordIncludingInText(String text);            //TODO: rename
-    }
-
-    /**
-     *
-     */
     interface ExactOccurrencesInTree {
         Boolean isWordIncludingInTree(TreeSet<String> tree, String word);
     }
@@ -67,12 +60,14 @@ public class SearchServiceImpl implements SearchService {
     private SearchService searchService;         //TODO: remove
 
     @Autowired
-    private MetricService metricService;                      //TODO: try with stream
+    private MetricService metricService;         //TODO: try with stream
 
     /**
-     * Set with words from all services in the base.
+     * Object with words from all services in the base.
      */
     private Dictionary dictionary = new Dictionary();
+
+    private long numberOFAllServices;    //is filled in getResultServiceSet(...)
 
     private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
@@ -85,6 +80,14 @@ public class SearchServiceImpl implements SearchService {
     private static final String LATIN_LAYOUT = "qwertyuiop[]asdfghjkl;'zxcvbnm,./QWERTYUIOP[]ASDFGHJKL;'ZXCVBNM,./";
 
     private static final String DICTIONARY_FILE_NAME = "dictionary.dat";
+
+    private static final String CATEGORY_TYPE_ALL = "all";
+
+    private static final String ERROR_BY_DESERIALIZATION = "Error: %s, by deserialization";
+
+    private static final int NUMBER_OF_SERVICES_CATEGORY = 3;
+
+    private static final int MINIMUM_SIZE_OF_FOUND_SERVICES_FOR_GET_ALTERNATIVE_SEARCH_LINE = 5;
 
     @Override
     public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) throws IOException {
@@ -105,7 +108,7 @@ public class SearchServiceImpl implements SearchService {
                 newSearchLine.append(requestWord);
             } else {
                 String oppositeWord
-                        = this.searchService.getStringByOppositeKeyboardLayout(requestWord);
+                        = getStringByOppositeKeyboardLayout(requestWord);
                 if (occurrences.isWordIncludingInTree(dictionaryContent, oppositeWord)) {
                     newSearchLine.append(oppositeWord);
                 } else {
@@ -118,6 +121,7 @@ public class SearchServiceImpl implements SearchService {
 
         newSearchLine.deleteCharAt(newSearchLine.length() - 1);  //deletes last space
         result.setSearchLine(newSearchLine.toString());
+        result.setCategory(sourceSearchRequest.getCategory());
 
         return result;
     }
@@ -145,39 +149,39 @@ public class SearchServiceImpl implements SearchService {
         };
 
         String[] searchLineWords = searchLine.split(REGEX_FOR_SPLIT);
-        ExactOccurrencesInText checking = (string) -> Arrays.stream(searchLineWords)
-                .allMatch(searchWord -> arrayList.getArrayFromTexts(string, "")
-                        .contains(searchWord));
 
         searchResults.addAll(allServiceSet.stream()
-                .filter(service ->
-                        checking.isWordIncludingInText(service.getNameOfService())
-                                ||
-                                checking.isWordIncludingInText(service.getDescription()))
-                .collect(Collectors.toSet()));
+                .filter(service -> {
+                    /* Is category of current service equals with search request category? */
+                    boolean isServiceCategorySuitable;
+                    if (searchRequest.getCategory().equals(CATEGORY_TYPE_ALL)) {
+                        isServiceCategorySuitable = true;
+                    } else {
+                        isServiceCategorySuitable
+                                = service.getCategory().equals(searchRequest.getCategory());
+                    }
 
-        //if()      //TODO: add if() in "did_you_meant_it" too so that dont show it if searchResultsSet is sufficiently filled
+                    return arrayList.getArrayFromTexts(service.getNameOfService(), service.getDescription())
+                            .stream().anyMatch(word ->
+                            Arrays.stream(searchLineWords)
+                                    .collect(Collectors.toList())
+                                    .contains(word.toLowerCase()) && isServiceCategorySuitable);
+                }).collect(Collectors.toSet()));
 
-        searchResults.addAll(allServiceSet.stream()
-                .filter(service ->
-                        arrayList.getArrayFromTexts(service.getNameOfService(), service.getDescription())
-                                .stream().anyMatch(word ->
-                                Arrays.stream(searchLineWords)
-                                        .collect(Collectors.toList()).contains(word.toLowerCase())))
-                .collect(Collectors.toSet()));
+        this.numberOFAllServices = searchResults.size();   // for isThereEnoughOfALotServicesFoundForAlternativeSearchLine(...)
 
         return searchResults;
-    }    //TODO: add category in jsp
+    }
 
     @Override
     public ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest) throws IOException {
         ArrayList<String> result = new ArrayList<>();
 
         Map<String, HashMap<String, Integer>> wordsWithDistance
-                = this.searchService.getWordsWithMinimumDistance(searchRequest);
+                = getWordsWithMinimumDistance(searchRequest);
 
         for (int i = 0; i < 5; i++) {
-            String alternativeSearchLine = this.searchService.getAlternativeSearchLine(        //TODO: add check language of alternativeSearchLine and searchLine
+            String alternativeSearchLine = getAlternativeSearchLine(        //TODO: add check language of alternativeSearchLine and searchLine
                     wordsWithDistance,
                     searchRequest);
             result.add(alternativeSearchLine);
@@ -220,12 +224,23 @@ public class SearchServiceImpl implements SearchService {
                                             .equals(minDistanceMap.get(requestWord)))
                             .findAny().get().getKey());
 
-            result.append(" ");     //TODO: check "hasnext" and delete space if hasnt
+            result.append(" ");
         });
 
         result.deleteCharAt(result.length() - 1);    //delete last separating space
 
         return result.toString();
+    }
+
+    @Override
+    public boolean isThereEnoughOfALotServicesFoundForAlternativeSearchLine(long numberOfFoundServices, String category) {
+        if (numberOfFoundServices <= MINIMUM_SIZE_OF_FOUND_SERVICES_FOR_GET_ALTERNATIVE_SEARCH_LINE) {
+            return true;
+        } else if (category.equals(CATEGORY_TYPE_ALL)) {
+            return numberOfFoundServices <= this.numberOFAllServices / 50;
+        } else {
+            return numberOfFoundServices <= this.numberOFAllServices / 50 * NUMBER_OF_SERVICES_CATEGORY;
+        }
     }
 
     @Override
@@ -238,12 +253,13 @@ public class SearchServiceImpl implements SearchService {
         Distance distance = (dictString, userString) ->
                 this.metricService.getPrefixDistance(dictString, userString, 8);
 
-        if (this.dictionary.getDictionaryContent() == null) {
+        if (this.dictionary.getDictionaryContent() == null
+                || this.dictionary.getDictionaryContent().size() != getDictionary().getDictionaryContent().size()) {
             this.dictionary = getDictionary();
 
             if (this.dictionary.getDictionaryContent() == null) {
-                this.searchService.initializeDictionary(dictionary);
-                this.searchService.saveDictionary(dictionary);
+                initializeDictionary(dictionary);
+                saveDictionary(dictionary);
                 this.dictionary = getDictionary();
             }
         }
@@ -302,10 +318,10 @@ public class SearchServiceImpl implements SearchService {
                     service.getNameOfService(), service.getDescription()};
 
             Arrays.stream(texts).forEach(text ->
-                resultDictionaryContent.addAll(Arrays.stream(
-                        text.toLowerCase().split(REGEX_FOR_SPLIT))
-                        .filter(word -> this.searchService.isStringSuitableForDictionary(word))
-                        .collect(Collectors.toSet())));
+                    resultDictionaryContent.addAll(Arrays.stream(
+                            text.toLowerCase().split(REGEX_FOR_SPLIT))
+                            .filter(word -> this.searchService.isStringSuitableForDictionary(word))
+                            .collect(Collectors.toSet())));
         });
 
         dictionary.setDictionaryContent(resultDictionaryContent);
@@ -317,8 +333,6 @@ public class SearchServiceImpl implements SearchService {
         objectOutput.writeObject(dictionary);
         objectOutput.flush();
         objectOutput.close();
-
-        this.dictionary.setDictionaryContent(null);
     }
 
     @Override
@@ -327,7 +341,7 @@ public class SearchServiceImpl implements SearchService {
         try (ObjectInput objectInput = new ObjectInputStream(new FileInputStream(DICTIONARY_FILE_NAME))) {
             resultDictionary = (Dictionary) objectInput.readObject();
         } catch (ClassNotFoundException e) {
-            logger.debug("Error: " + e.getMessage() + " by deserialization");
+            logger.debug(String.format(ERROR_BY_DESERIALIZATION, e.getMessage()));
             e.printStackTrace();
         }
 

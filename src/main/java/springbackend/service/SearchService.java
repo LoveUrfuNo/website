@@ -40,6 +40,12 @@ public interface SearchService {
 
     /**
      *
+     * @return
+     */
+    boolean isThereEnoughOfALotServicesFoundForAlternativeSearchLine(long numberOfFoundServices, String category);     //TODO: rename
+
+    /**
+     *
      */
     Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) throws IOException;
 

@@ -117,15 +117,14 @@ public class SearchController {
                     ERROR_BY_AUTO_COMPLETE, e.getMessage(), searchRequest.getSearchLine()));
             e.printStackTrace();
 
-            return "redirect";  //TODO: add correct redirect
+            return "redirect";  //TODO: add message in jsp with information about error
         }
 
         TreeSet<Service> finalSearchResults
                 = this.searchService.getResultServiceSet(editedSearchRequest);
 
         boolean isNewSearchRequestEqualOriginal =
-                Arrays.equals(
-                        editedSearchRequest.getSearchLine().split(REGEX_FOR_SPLIT),
+                Arrays.equals(editedSearchRequest.getSearchLine().split(REGEX_FOR_SPLIT),
                         searchRequest.getSearchLine().split(REGEX_FOR_SPLIT));
 
         if (isNewSearchRequestEqualOriginal) {
@@ -137,15 +136,21 @@ public class SearchController {
                         ". Can't get wordsWithDistance from this.searchService.getWordsWithMinimumDistance");
                 e.printStackTrace();
 
-                return "redirect";     //TODO: add correct return
+                return "redirect";     //TODO: add message in jsp with information about error
             }
 
             String alternativeSearchLine = this.searchService.getAlternativeSearchLine(
                     wordsWithDistance, editedSearchRequest);
-            if (alternativeSearchLine.equalsIgnoreCase(editedSearchRequest.getSearchLine())) {   //TODO: move this block of code to SearchService
-                model.addAttribute("did_you_meant_it", null);
-            } else {
+
+            boolean isAlternativeSearchLineNeeded
+                    = alternativeSearchLine.equalsIgnoreCase(editedSearchRequest.getSearchLine())
+                    || this.searchService.isThereEnoughOfALotServicesFoundForAlternativeSearchLine(
+                            finalSearchResults.size(), searchRequest.getCategory());
+
+            if (isAlternativeSearchLineNeeded) {
                 model.addAttribute("did_you_meant_it", alternativeSearchLine);
+            } else {
+                model.addAttribute("did_you_meant_it", null);
             }
         } else {
             model.addAttribute("results_of_the_request_are_shown",

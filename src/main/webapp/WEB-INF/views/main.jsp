@@ -99,6 +99,16 @@
                                                     <form:input id="tags" path="searchLine"
                                                                 type="text"
                                                                 placeholder="Поиск услуг"/>
+                                                    <spring:bind path="category">
+                                                        <label>
+                                                            <form:select path="category">
+                                                                <option value="all">Все</option>
+                                                                <option value="1category">Категория 1</option>
+                                                                <option value="2category">Категория 2</option>
+                                                                <option value="3category">Категория 3</option>
+                                                            </form:select>
+                                                        </label>
+                                                    </spring:bind>
                                                     <form:errors path="searchLine"/>
                                                 </div>
                                             </spring:bind>
@@ -111,7 +121,7 @@
                                             <div id="asd2">
 
                                             </div>
-                                            <div id="asd3">
+                                            <div id="asd3">        <%--TODO: finish--%>
 
                                             </div>
                                             <div id="asd4">

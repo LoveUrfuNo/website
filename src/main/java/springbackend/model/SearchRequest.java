@@ -10,6 +10,16 @@ package springbackend.model;
 public class SearchRequest {
     private String searchLine;
 
+    private String category;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getSearchLine() {
         return searchLine;
     }

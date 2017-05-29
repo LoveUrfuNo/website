@@ -378,7 +378,8 @@
         </div>
     </spring:bind>
     <button onclick="uploadServicesPhotos('${_csrf.parameterName}=${_csrf.token}')"
-            class="ui button" type="button">Добавить</button>
+            class="ui button" type="button">Добавить
+    </button>
 </form:form>
 <a href="${pageContext.request.contextPath}/redirect" class="col-sm-12 btn btn-primary">Назад</a>
 
