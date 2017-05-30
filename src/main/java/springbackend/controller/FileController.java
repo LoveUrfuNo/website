@@ -40,7 +40,7 @@ public class FileController {
     private StringService stringService;
 
     private static final String rootPath =
-            "C:\\Users\\kosty\\Desktop\\for development\\website\\src\\main\\webapp\\resources\\user's\\images\\for_services";
+            "C:\\Users\\kosty\\Desktop\\for development\\website\\src\\main\\webapp\\resources\\user's";
 
     private static final Long ROLE_USER = 1L;
 
@@ -84,7 +84,7 @@ public class FileController {
                 logger.info("You failed to upload " + name + " => " + e.getMessage());
             }
         } else {
-            logger.info("You failed to upload " + name + " because the file was empty.");
+            logger.info("You failed to upload, because the file was empty.");
         }
 
         assert uploadedFile != null;
@@ -95,7 +95,7 @@ public class FileController {
             this.userService.saveAndFlush(currentUser, ROLE_USER);
         } else if (operation.contains("loadServicePhoto")) {
             UserFile userFile = new UserFile();
-            userFile.setTypeOfFile("photo");
+            userFile.setFileType("photo");
             userFile.setPathToFile(this.stringService.makePathForFile(path));
             userFile.setServiceName(operation.substring(operation.indexOf('+') + 1));
             userFile.setUserId(currentUser.getId());

@@ -32,5 +32,3 @@ src/main/webapp/resources/user's/videos/
 target/backend/WEB-INF/classes/springbackend/
 target/backend/WEB-INF/lib/
 target/classes/springbackend/
-target/generated-sources/
-target/website/

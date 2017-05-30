@@ -166,7 +166,7 @@ public class SearchServiceImpl implements SearchService {
                             searchRequest.getCategory().equals(CATEGORY_TYPE_ALL)
                                     || service.getCategory().equals(searchRequest.getCategory());
 
-                    return arrayList.getArrayFromText(service.getNameOfService() + " " + service.getDescription())
+                    return arrayList.getArrayFromText(service.getServiceName() + " " + service.getDescription())
                             .stream().anyMatch(word ->
                                     Arrays.stream(searchLineWords)
                                             .collect(Collectors.toList())
@@ -321,7 +321,7 @@ public class SearchServiceImpl implements SearchService {
         Set<Service> allServiceSet = this.serviceForService.findAll();
         allServiceSet.forEach(service -> {
             String[] texts = new String[]{
-                    service.getNameOfService(), service.getDescription()};
+                    service.getServiceName(), service.getDescription()};
 
             Arrays.stream(texts).forEach(text ->
                     resultDictionaryContent.addAll(Arrays.stream(

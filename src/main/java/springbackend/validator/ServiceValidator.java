@@ -27,13 +27,13 @@ public class ServiceValidator implements Validator {
     public void validate(Object target, Errors errors) {
         Service service = (Service) target;
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "nameOfService", "Required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "serviceName", "Required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "category", "Required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "description", "Required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "serviceCost", "Required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "country", "Required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "city", "Required");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "typeOfService", "Required");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "serviceType", "Required");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "currency", "Required");
     }
 }

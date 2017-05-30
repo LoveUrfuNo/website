@@ -22,13 +22,13 @@
 <form:form onsubmit="return serviceValidate()" method="POST" modelAttribute="serviceForm"
            action="/add_service"
            class="ui form">
-    <spring:bind path="nameOfService">
+    <spring:bind path="serviceName">
         <div class="field ${status.error ? 'has-error' : ''}">
             <label>Название услуги</label>
-            <form:input minlength="2" maxlength="60" path="nameOfService"
+            <form:input minlength="2" maxlength="60" path="serviceName"
                         type="text" name="first-name"
                         placeholder="Сигна"/>
-            <form:errors path="nameOfService"/>
+            <form:errors path="serviceName"/>
         </div>
     </spring:bind>
     <spring:bind path="category">
@@ -356,11 +356,11 @@
             <form:errors path="category"/>
         </div>
     </spring:bind>
-    <spring:bind path="typeOfService">
+    <spring:bind path="serviceType">
         <div class="field ${status.error ? 'has-error' : ''}">
             <label>Тип услуги</label>
             <div class="ui selection dropdown">
-                <form:input path="typeOfService" type="hidden" name=""/>
+                <form:input path="serviceType" type="hidden" name=""/>
                 <i class="dropdown icon"></i>
                 <div class="default text">Тип услуги</div>
                 <div class="menu">
@@ -373,7 +373,7 @@
                         Обычный
                     </div>
                 </div>
-                <form:errors path="typeOfService"/>
+                <form:errors path="serviceType"/>
             </div>
         </div>
     </spring:bind>

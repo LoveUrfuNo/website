@@ -11,13 +11,13 @@
 </h2>
 <a href="${pageContext.request.contextPath}/add_service">Добавить</a>
 <c:forEach var="service" items="${user.services}">
-    <h4>${service.nameOfService}</h4>
-    <c:if test="${files.get(service.nameOfService) != null}">
-        <c:forEach var="file" items="${files.get(service.nameOfService)}">
+    <h4>${service.serviceName}</h4>
+    <c:if test="${files.get(service.serviceName) != null}">
+        <c:forEach var="file" items="${files.get(service.serviceName)}">
             <img src="${file.pathToFile}" alt="sorayn">
         </c:forEach>
     </c:if>
-    <c:if test="${files.get(service.nameOfService) == null}">
+    <c:if test="${files.get(service.serviceName) == null}">
         <img class="profile-icon"
              src="${pageContext.request.contextPath}/resources/images/unknown_photo_service.png">
     </c:if>

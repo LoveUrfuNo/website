@@ -37,8 +37,7 @@ public class ServiceForServiceImpl implements ServiceForService {
 
     @Override
     public Service findByUserId(Long userId) {
-        return this.serviceDao.findByUserId(userId); /*findAll().stream()
-                .filter(temp -> temp.getUserId().equals(userId)).findFirst().orElse(null);*/
+        return this.serviceDao.findByUserId(userId);
     }
 
     @Override

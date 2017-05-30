@@ -17,7 +17,7 @@ public class UserFile {
     private Long id;
 
     @Column(name = "type")
-    private String typeOfFile;
+    private String fileType;
 
     @Column(name = "path_to_file")
     private String pathToFile;
@@ -36,12 +36,12 @@ public class UserFile {
         this.id = id;
     }
 
-    public String getTypeOfFile() {
-        return typeOfFile;
+    public String getFileType() {
+        return fileType;
     }
 
-    public void setTypeOfFile(String typeOfFile) {
-        this.typeOfFile = typeOfFile;
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
     public String getPathToFile() {
@@ -72,7 +72,7 @@ public class UserFile {
     public String toString() {
         return "UserFile{" +
                 "id=" + id +
-                ", typeOfFile='" + typeOfFile + '\'' +
+                ", typeOfFile='" + fileType + '\'' +
                 ", pathToFile='" + pathToFile + '\'' +
                 ", serviceName='" + serviceName + '\'' +
                 '}';

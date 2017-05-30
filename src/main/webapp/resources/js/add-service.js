@@ -31,7 +31,7 @@ var uploadServicesPhotos = function (_csrf) {
         for (var i = 0; i < photos.length; i++) {
             formData.set('file', photos[i]);
             xhr.open("POST", "/uploadFile/loadServicePhoto+"
-                + document.getElementById('nameOfService').value + "?" + _csrf, true);
+                + document.getElementById('serviceName').value + "?" + _csrf, true);
             xhr.send(formData);
         }
 

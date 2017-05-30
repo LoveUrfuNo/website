@@ -22,7 +22,7 @@ public class Service {
     private Long userId;
 
     @Column(name = "service_name")
-    private String nameOfService;
+    private String serviceName;
 
     @Column(name = "cost")
     private Integer serviceCost;
@@ -40,7 +40,7 @@ public class Service {
     private String city;
 
     @Column(name = "type_of_service")
-    private String typeOfService;
+    private String serviceType;
 
     @Column(name = "currency")
     private String currency;
@@ -65,12 +65,12 @@ public class Service {
         this.userId = userId;
     }
 
-    public String getNameOfService() {
-        return nameOfService;
+    public String getServiceName() {
+        return serviceName;
     }
 
-    public void setNameOfService(String nameOfService) {
-        this.nameOfService = nameOfService;
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
     }
 
     public Integer getServiceCost() {
@@ -113,12 +113,12 @@ public class Service {
         this.city = city;
     }
 
-    public String getTypeOfService() {
-        return typeOfService;
+    public String getServiceType() {
+        return serviceType;
     }
 
-    public void setTypeOfService(String typeOfService) {
-        this.typeOfService = typeOfService;
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
     }
 
     public String getCurrency() {
@@ -142,13 +142,13 @@ public class Service {
         return "Service{" +
                 "id=" + id +
                 ", userId=" + userId +
-                ", nameOfService='" + nameOfService + '\'' +
+                ", nameOfService='" + serviceName + '\'' +
                 ", serviceCost=" + serviceCost +
                 ", category='" + category + '\'' +
                 ", description='" + description + '\'' +
                 ", country='" + country + '\'' +
                 ", city='" + city + '\'' +
-                ", typeOfService='" + typeOfService + '\'' +
+                ", typeOfService='" + serviceType + '\'' +
                 ", currency='" + currency + '\'' +
                 ", user=" + user +
                 '}';

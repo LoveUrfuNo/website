@@ -65,7 +65,7 @@ public class ServiceController {
         service.setUser(user);
         service.setUserId(service.getUser().getId());
         try {
-            service.setNameOfService(stringService.decoding(service.getNameOfService()));
+            service.setServiceName(stringService.decoding(service.getServiceName()));
             service.setDescription(stringService.decoding(service.getDescription()));
             this.serviceForService.save(service);
         } catch (UnsupportedEncodingException e) {
@@ -101,7 +101,7 @@ public class ServiceController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = this.userService.findByUsername(auth.getName());
         user.getServices().sort(
-                (o1, o2) -> o1.getNameOfService().compareToIgnoreCase(o2.getNameOfService()));
+                (o1, o2) -> o1.getServiceName().compareToIgnoreCase(o2.getServiceName()));
 
         Map<String, Set<UserFile>> fileMap = new HashMap<>();
 
@@ -125,7 +125,7 @@ public class ServiceController {
             this.serviceForService.delete(service);
 
             this.userFileService.findAllByUserId(user.getId()).stream()
-                    .filter(t -> t.getServiceName().equals(service.getNameOfService()))
+                    .filter(t -> t.getServiceName().equals(service.getServiceName()))
                     .forEach(temp -> this.userFileService.delete(temp));
         } else {
             return "error-page";
