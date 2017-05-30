@@ -135,9 +135,9 @@
             <div class="xs-margin-top col-xs-12 col-sm-5 col-sm-push-1">
                 <p class="col-xs-10 col-xs-1 text-center">Наши контакты</p>
                 <div class="contact col-xs-10 col-xs-push-2"><span><i class="fa fa-map-marker"
-                                                                      aria-hidden="true"></i><span>Улица Пушкина, дом Колотушкина</span></span>
+                                                                      aria-hidden="true"></i><span>Улица Пушкина, дом -12</span></span>
                 </div>
-                <div class="contact col-xs-10 col-xs-push-2"><i class="fa fa-phone" aria-hidden="true"></i><a href="#">+7-999-560-39-68</a>
+                <div class="contact col-xs-10 col-xs-push-2"><i class="fa fa-phone" aria-hidden="true"></i><a href="#">+7-999-999-99-99-999</a>
                 </div>
                 <div class="contact col-xs-10 col-xs-push-2"><i class="fa fa-envelope" aria-hidden="true"></i><a
                         href="#">deal.agentservice@gmail.com</a>
