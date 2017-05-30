@@ -6,6 +6,7 @@ package springbackend.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +23,10 @@ import springbackend.validator.SearchValidator;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
 import java.util.*;
+
+import static springbackend.service.implementation.SearchServiceImpl.REGEX_FOR_REPLACE;
+import static springbackend.service.implementation.SearchServiceImpl.REGEX_FOR_SPLIT;
 
 /**
  * Controller for {@link springbackend.model.SearchRequest}.
@@ -37,10 +40,6 @@ public class SearchController {
     private SearchService searchService;
 
     private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
-
-    private static final String REGEX_FOR_REPLACE = "[^а-я\\w-][\\s]{2,}";   //TODO: try to import from SearchServiceImpl
-
-    private static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
 
     private static final String ERROR_BY_AUTO_COMPLETE
             = "Error: %s. Can't get array of strings with auto complete variants from" +
@@ -121,17 +120,7 @@ public class SearchController {
             return "redirect";
         }
 
-        SearchRequest editedSearchRequest;
-        try {
-            editedSearchRequest = this.searchService.getEditedSearchRequest(searchRequest);
-        } catch (IOException e) {
-            logger.debug(String.format(
-                    ERROR_BY_AUTO_COMPLETE, e.getMessage(), searchRequest.getSearchLine()));
-            e.printStackTrace();
-
-            return "redirect";  //TODO: add message in jsp with information about error
-        }
-
+        SearchRequest editedSearchRequest = this.searchService.getEditedSearchRequest(searchRequest);
         TreeSet<Service> finalSearchResults
                 = this.searchService.getResultServiceSet(editedSearchRequest);
 

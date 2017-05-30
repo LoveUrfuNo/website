@@ -23,9 +23,8 @@ public interface SearchService {
      *
      * @param sourceSearchRequest - original search request with search line and category of services.
      * @return new search request by corrections of original request.
-     * @throws IOException - from getDictionary().
      */
-    SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) throws IOException;
+    SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest);
 
     /**
      * Returns a service set which satisfies the search conditions and
@@ -63,10 +62,14 @@ public interface SearchService {
      * @param category              - selected category.
      * @return boolean result.
      */
-    boolean isAlternativeSearchLineNeeded(long numberOfFoundServices, String category);     //TODO: rename
+    boolean isAlternativeSearchLineNeeded(long numberOfFoundServices, String category);
 
     /**
+     * Returns map with words from request and with pair consisting distance and word from dictionary.
      *
+     * @param searchRequest - search request with search line and category of services.
+     * @return result map.
+     * @throws IOException - from saveDictionary(...).
      */
     Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) throws IOException;
 
@@ -79,22 +82,30 @@ public interface SearchService {
     String getStringByOppositeKeyboardLayout(String sourceString);
 
     /**
-     * @return
+     * Initializes dictionary by all services.
+     *
+     * @param dictionary - object Dictionary with words set.
      */
     void initializeDictionary(Dictionary dictionary);
 
     /**
+     * Serializes dictionary.
      *
+     * @param dictionary - object Dictionary with words set.
+     * @throws IOException - FileNotFoundException and IOException
+     * thrown down into the controller {@link springbackend.controller.SearchController}
      */
     void saveDictionary(Dictionary dictionary) throws IOException;
 
     /**
+     * Deserializes dictionary and returns object with dictionary words set.
      *
+     * @return object Dictionary. {@link springbackend.model.Dictionary}
      */
-    Dictionary getDictionary() throws IOException;
+    Dictionary getDictionary();
 
     /**
-     * Checks that is string has normal length, and has only letters.
+     * Checks that string has normal length, and has only letters.
      *
      * @param testString - string to be check.
      * @return boolean result.

@@ -61,8 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByLogin(String login) {
-        return this.userDao.findAll().stream()
-                .filter(temp -> login.equals(temp.getLogin())).findAny().orElse(null);
+        return this.userDao.findByLogin(login);
     }
 
     @Override

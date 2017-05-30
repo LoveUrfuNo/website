@@ -40,7 +40,7 @@ public class FileController {
     private StringService stringService;
 
     private static final String rootPath =
-            "C:\\Users\\kosty\\IntellijProjects\\Deal\\backend\\src\\main\\webapp\\resources\\user's\\";
+            "C:\\Users\\kosty\\Desktop\\for development\\website\\src\\main\\webapp\\resources\\user's\\images\\for_services";
 
     private static final Long ROLE_USER = 1L;
 

@@ -18,6 +18,8 @@ public interface ServiceDao extends JpaRepository<Service, Long> {
 
     Service findById(Long id);
 
+    Service findByUserId(Long userId);
+
     Set<Service> findAllByUserId(Long userId);
 
     Set<Service> findAllByCategory(String category);

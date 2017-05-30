@@ -548,15 +548,15 @@
                     <div class="col-md-6 col-sm-6 services-num services-num-text-right">
                         <span class="number-holder"></span>
                         <div class="desc">
-                            <h3>Школьники делают сайт</h3>
-                            <p>Собралась команда и начала создавать что-то</p>
+                            <h3>Текст</h3>
+                            <p>Текст Текст</p>
                         </div>
                     </div>
                     <div class="col-md-6 col-sm-6 services-num">
                         <span class="number-holder"></span>
                         <div class="desc">
                             <h3>С нами сотрудничают такие компании как</h3>
-                            <p>кто-то, что-то</p>
+                            <p>Текст, Текст</p>
                         </div>
                     </div>
                 </div>
@@ -775,34 +775,6 @@
             </div>
         </div>
     </div><!-- end fh5co-featured-work-section -->
-
-    <div id="fh5co-blog-section">
-        <div class="container">
-            <div class="heading-section text-center">
-                <h2>Недавние обновления</h2>
-            </div>
-            <div class="row">
-                <div class="col-md-4 blog-section">
-                    <span>22 <small>Марта 2017</small></span>
-                    <h3><a href="#">Начали разрабатывать что-то</a></h3>
-                    <p>Что-то сделали, работает хорошо, но не очень, скоро релиз</p>
-                    <a class="btn btn-primary" href="#">Подробнее</a>
-                </div>
-                <div class="col-md-4 blog-section">
-                    <span>13 <small>Май 2017</small></span>
-                    <h3><a href="#">Начали разрабатывать что-то</a></h3>
-                    <p>FЧто-то сделали, работает хорошо, но не очень, скоро релиз</p>
-                    <a class="btn btn-primary" href="#">Подробнее</a>
-                </div>
-                <div class="col-md-4 blog-section">
-                    <span>01 <small>Апрель 2017</small></span>
-                    <h3><a href="#">Начали разрабатывать что-то</a></h3>
-                    <p>Что-то сделали, работает хорошо, но не очень, скоро релиз</p>
-                    <a class="btn btn-primary" href="#">Подробнее</a>
-                </div>
-            </div>
-        </div>
-    </div><!-- end: fh5co-blog-section -->
 
     <div class="fh5co-parallax"
          style="background-image: url(https://cdn2.professor-falken.com/wp-content/uploads/2017/01/hombre-cuello-camisa-corbata-barba-mano-Fondos-de-Pantalla-HD-professor-falken.com_.jpg);"

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import springbackend.service.MetricService;
 
 /**
- * Метрика Дамерау-Левенштейна.
+ * The Dahmerau-Lowenstein metric.
  */
 @Service
 public class MetricServiceImpl implements MetricService {
@@ -52,7 +52,6 @@ public class MetricServiceImpl implements MetricService {
             char stringCh = string.charAt(i - 1);
             currentRow[0] = i;
 
-            // Вычисляем только диагональную полосу шириной 2 * (max + 1)
             int from = Math.max(i - max - 1, 1);
             int to = Math.min(i + max + 1, prefixLength);
 
@@ -60,12 +59,9 @@ public class MetricServiceImpl implements MetricService {
             for (int j = from; j <= to; j++) {
                 char prefixCh = prefix.charAt(j - 1);
 
-                // Вычисляем минимальную цену перехода в текущее состояние из предыдущих среди удаления, вставки и
-                // замены соответственно.
                 int cost = prefixCh == stringCh ? 0 : 1;
                 int value = Math.min(Math.min(currentRow[j - 1] + 1, previousRow[j] + 1), previousRow[j - 1] + cost);
 
-                // Если вдруг была транспозиция, надо также учесть и её стоимость.
                 if (prefixCh == lastStringCh && stringCh == lastPrefixCh)
                     value = Math.min(value, transpositionRow[j - 2] + cost);
 
@@ -74,8 +70,6 @@ public class MetricServiceImpl implements MetricService {
             }
             lastStringCh = stringCh;
 
-            // Вычисляем минимальное расстояние от заданного префикса ко всем префиксам строки, отличающимся от
-            // заданного не более чем на max
             if (i >= prefixLength - max && i <= prefixLength + max && currentRow[prefixLength] < distance)
                 distance = currentRow[prefixLength];
 

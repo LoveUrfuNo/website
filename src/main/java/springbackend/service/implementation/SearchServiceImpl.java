@@ -25,39 +25,51 @@ import java.util.stream.Collectors;
  */
 @org.springframework.stereotype.Service
 public class SearchServiceImpl implements SearchService {
-    /**
-     *
-     */
     interface Distance {
+        /**
+         * Functional interface, which gets metric from {@link springbackend.service.implementation.MetricServiceImpl}.
+         *
+         * @param word1 in our case - dictionary word.
+         * @param word2 - prefix.
+         * @return metric(distance).
+         */
         int getDistance(CharSequence word1, CharSequence word2);
     }
 
-    /**
-     *
-     */
+
     interface Array {
-        ArrayList<String> getArrayFromTexts(String string1, String string2);
+        /**
+         * Functional interface, which gets ArrayList with words by text.
+         *
+         * @param string - text.
+         * @return array with words.
+         */
+        ArrayList<String> getArrayFromText(String string);
     }
 
-    /**
-     *
-     */
     interface ExactOccurrencesInTree {
+        /**
+         * Functional interface, which checks word on including in any string in tree.
+         *
+         * @param tree - treeSet with words.
+         * @param word - word to be check.
+         * @return boolean result.
+         */
         Boolean isWordIncludingInTree(TreeSet<String> tree, String word);
     }
 
-    /**
-     *
-     */
     interface OppositeWord {
-        String getWordFromOppositeKeybordLayout(String sourceWord);
+        /**
+         * Functional interface, which translates sourceWord on opposite keyboard and
+         * return if we need it, and, otherwise, returns the original word.
+         *
+         * @return result string.
+         */
+        String getWordFromOppositeKeyboardLayout(String sourceWord);
     }
 
     @Autowired
     private ServiceForService serviceForService;
-
-    @Autowired
-    private SearchService searchService;         //TODO: remove
 
     @Autowired
     private MetricService metricService;         //TODO: try with stream
@@ -71,9 +83,9 @@ public class SearchServiceImpl implements SearchService {
 
     private static final Logger logger = LoggerFactory.getLogger(SearchServiceImpl.class);
 
-    private static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
+    public static final String REGEX_FOR_SPLIT = "[[\\p{P}][\\t\\n\\r\\s]+=№]";
 
-    private static final String REGEX_FOR_REPLACE = "[^а-я\\w-][\\s]{2,}";
+    public static final String REGEX_FOR_REPLACE = "[^а-я\\w-][\\s]{2,}";
 
     private static final String REGEX_FOR_VERIFYING_WORD_FOR_THE_DICTIONARY = "^[а-яa-z]{3,50}+$";
 
@@ -92,7 +104,7 @@ public class SearchServiceImpl implements SearchService {
     private static final int MINIMUM_SIZE_OF_FOUND_SERVICES = 5;
 
     @Override
-    public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) throws IOException {
+    public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) {
         SearchRequest result = new SearchRequest();
         StringBuilder newSearchLine = new StringBuilder();
         String[] wordsFromRequest = sourceSearchRequest.getSearchLine()
@@ -135,14 +147,9 @@ public class SearchServiceImpl implements SearchService {
 
         String searchLine = searchRequest.getSearchLine().replaceAll(REGEX_FOR_REPLACE, "");
 
-        Array arrayList = (string1, string2) -> {
+        Array arrayList = (string) -> {
             ArrayList<String> result = new ArrayList<>();
-
-            result.addAll(Arrays.stream(string1.split(REGEX_FOR_SPLIT))
-                    .map(t -> t.replaceAll(REGEX_FOR_REPLACE, ""))
-                    .filter(word -> !word.isEmpty()).distinct()
-                    .collect(Collectors.toList()));
-            result.addAll(Arrays.stream(string2.split(REGEX_FOR_SPLIT))
+            result.addAll(Arrays.stream(string.split(REGEX_FOR_SPLIT))
                     .map(t -> t.replaceAll(REGEX_FOR_REPLACE, ""))
                     .filter(word -> !word.isEmpty()).distinct()
                     .collect(Collectors.toList()));
@@ -155,19 +162,15 @@ public class SearchServiceImpl implements SearchService {
         searchResults.addAll(allServiceSet.stream()
                 .filter(service -> {
                     /* Is category of current service equals with search request category? */
-                    boolean isServiceCategorySuitable;
-                    if (searchRequest.getCategory().equals(CATEGORY_TYPE_ALL)) {
-                        isServiceCategorySuitable = true;
-                    } else {
-                        isServiceCategorySuitable
-                                = service.getCategory().equals(searchRequest.getCategory());
-                    }
+                    boolean isServiceCategorySuitable =
+                            searchRequest.getCategory().equals(CATEGORY_TYPE_ALL)
+                                    || service.getCategory().equals(searchRequest.getCategory());
 
-                    return arrayList.getArrayFromTexts(service.getNameOfService(), service.getDescription())
+                    return arrayList.getArrayFromText(service.getNameOfService() + " " + service.getDescription())
                             .stream().anyMatch(word ->
-                            Arrays.stream(searchLineWords)
-                                    .collect(Collectors.toList())
-                                    .contains(word.toLowerCase()) && isServiceCategorySuitable);
+                                    Arrays.stream(searchLineWords)
+                                            .collect(Collectors.toList())
+                                            .contains(word.toLowerCase()) && isServiceCategorySuitable);
                 }).collect(Collectors.toSet()));
 
         this.numberOFAllServices = searchResults.size();   // for isAlternativeSearchLineNeeded(...)
@@ -221,7 +224,7 @@ public class SearchServiceImpl implements SearchService {
             result.append(
                     wordsWithDistance.get(requestWord).entrySet().stream()
                             .filter(pair -> pair.getValue()
-                                            .equals(minDistanceMap.get(requestWord)))
+                                    .equals(minDistanceMap.get(requestWord)))
                             .findAny().get().getKey());
 
             result.append(" ");
@@ -238,7 +241,7 @@ public class SearchServiceImpl implements SearchService {
         if (numberOfFoundServices <= MINIMUM_SIZE_OF_FOUND_SERVICES) {
             result = true;
         } else if (category.equals(CATEGORY_TYPE_ALL)) {
-            result =  numberOfFoundServices <= this.numberOFAllServices / 50;
+            result = numberOfFoundServices <= this.numberOFAllServices / 50;
         } else {
             result = numberOfFoundServices <= this.numberOFAllServices / 50 * NUMBER_OF_SERVICES_CATEGORY;
         }
@@ -303,7 +306,7 @@ public class SearchServiceImpl implements SearchService {
                 .replaceAll(REGEX_FOR_REPLACE, "")
                 .split(REGEX_FOR_SPLIT);
         Arrays.stream(arr).forEach(word -> newSearchLine
-                .append(oppositeWord.getWordFromOppositeKeybordLayout(word))
+                .append(oppositeWord.getWordFromOppositeKeyboardLayout(word))
                 .append(" "));
 
         newSearchLine.deleteCharAt(newSearchLine.length() - 1);  //delete last space
@@ -323,7 +326,7 @@ public class SearchServiceImpl implements SearchService {
             Arrays.stream(texts).forEach(text ->
                     resultDictionaryContent.addAll(Arrays.stream(
                             text.toLowerCase().split(REGEX_FOR_SPLIT))
-                            .filter(word -> this.searchService.isStringSuitableForDictionary(word))
+                            .filter(this::isStringSuitableForDictionary)
                             .collect(Collectors.toSet())));
         });
 
@@ -339,11 +342,11 @@ public class SearchServiceImpl implements SearchService {
     }
 
     @Override
-    public Dictionary getDictionary() throws IOException {
+    public Dictionary getDictionary() {
         Dictionary resultDictionary = null;
         try (ObjectInput objectInput = new ObjectInputStream(new FileInputStream(DICTIONARY_FILE_NAME))) {
             resultDictionary = (Dictionary) objectInput.readObject();
-        } catch (ClassNotFoundException e) {
+        } catch (IOException | ClassNotFoundException e) {
             logger.debug(String.format(ERROR_BY_DESERIALIZATION, e.getMessage()));
             e.printStackTrace();
         }

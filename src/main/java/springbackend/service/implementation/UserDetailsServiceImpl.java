@@ -33,9 +33,8 @@ public class UserDetailsServiceImpl extends JdbcDaoImpl {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = this.userService.findByUsername(username);
-        if (user == null) {
+        if (user == null)
             user = this.userService.findByLogin(username);
-        }
 
         if (!user.getRegistrationConfirmed() && !user.getRoles().stream()
                 .findFirst().orElse(null).getId().equals(ROLE_NOT_ACTIVATED_USER)) {
