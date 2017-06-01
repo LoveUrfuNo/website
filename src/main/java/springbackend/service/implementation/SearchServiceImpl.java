@@ -115,9 +115,9 @@ public class SearchServiceImpl implements SearchService {
             this.dictionary = getDictionary();
 
         ExactOccurrencesInTree occurrences = TreeSet::contains;
+
         Arrays.stream(wordsFromRequest).forEach(requestWord -> {
             TreeSet<String> dictionaryContent = this.dictionary.getDictionaryContent();
-
             if (occurrences.isWordIncludingInTree(dictionaryContent, requestWord)) {
                 newSearchLine.append(requestWord);
             } else {
@@ -322,7 +322,6 @@ public class SearchServiceImpl implements SearchService {
         allServiceSet.forEach(service -> {
             String[] texts = new String[]{
                     service.getServiceName(), service.getDescription()};
-
             Arrays.stream(texts).forEach(text ->
                     resultDictionaryContent.addAll(Arrays.stream(
                             text.toLowerCase().split(REGEX_FOR_SPLIT))
