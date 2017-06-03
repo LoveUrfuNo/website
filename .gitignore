@@ -33,4 +33,3 @@ target/backend/WEB-INF/classes/springbackend/
 target/backend/WEB-INF/lib/
 target/classes/springbackend/
 website.iml
-database.properties
