@@ -36,7 +36,6 @@ public class SearchServiceImpl implements SearchService {
         int getDistance(CharSequence word1, CharSequence word2);
     }
 
-
     interface Array {
         /**
          * Functional interface, which gets ArrayList with words by text.
@@ -72,7 +71,7 @@ public class SearchServiceImpl implements SearchService {
     private ServiceForService serviceForService;
 
     @Autowired
-    private MetricService metricService;         //TODO: try with stream
+    private MetricService metricService;
 
     /**
      * Object with words from all services in the base.

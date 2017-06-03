@@ -6,8 +6,6 @@ package springbackend.model;
 
 import javax.persistence.*;
 
-import javax.persistence.Entity;
-
 /**
  * Simple JavaBean domain object that represents a user's Service.
  */

@@ -115,7 +115,7 @@ public class SearchController {
             logger.debug(String.format(ERROR_BY_DECODING_STRING, e.getMessage(), auth.getName()));
             e.printStackTrace();
 
-            model.addAttribute("error_in_site_search", "vvedite drugoe plz");         //TODO: add in jsp
+            model.addAttribute("error_in_site_search", "Смените язык ввода, пожалуйста");         //TODO: add in jsp
 
             return "redirect";
         }
