@@ -7,7 +7,7 @@ var dropdown = $('.ui.dropdown')
 
 var exitConfirm = function () {
     $(window).on('beforeunload', function () {
-        return "Данные будут утеряны. Вы уверенные что хотите покинуть страницу?";
+        return "Данные будут утеряны. Вы уверены, что хотите покинуть страницу?";
     });
 
     $(document).on("submit", "form", function () {
