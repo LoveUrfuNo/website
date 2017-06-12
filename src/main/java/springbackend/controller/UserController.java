@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.controller;
 
 import org.slf4j.Logger;
@@ -117,7 +116,8 @@ public class UserController {
         model.addAttribute("userForm", new User());
         model.addAttribute("status", status);
 
-        String email = user.getUsername(), resultEmailService;
+        final String email = user.getUsername();
+        String resultEmailService;
         switch (email.substring(email.indexOf('@') + 1, email.length())) {       //TODO: add more services
             case "gmail.com":
                 resultEmailService = "mail.google.com";
@@ -156,9 +156,8 @@ public class UserController {
     public String options(@ModelAttribute("userOptionForm") User user,
                           BindingResult bindingResult) throws UnsupportedEncodingException {
         this.optionsValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors())
             return "advanced-options";
-        }
 
         User resultUser;
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -228,9 +227,8 @@ public class UserController {
     public String confirmAcc(@PathVariable("key") String key,
                              @PathVariable("id") Long id) {
         User user = this.userService.findBuId(id);
-        if (!user.getKeyForRegistrationConfirmUrl().equals(key)) {
+        if (!user.getKeyForRegistrationConfirmUrl().equals(key))
             return "error-page";
-        }
 
         user.setRegistrationConfirmed(true);
         user.setKeyForRegistrationConfirmUrl(null);
@@ -251,9 +249,8 @@ public class UserController {
     public String support(@ModelAttribute("userFormForTechnicalSupport") UserFormForTechnicalSupport userForSupport,
                           BindingResult bindingResult) throws UnsupportedEncodingException {
         this.userForSupportValidator.validate(userForSupport, bindingResult);
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors())
             return "support";
-        }
 
         userForSupport.setName(this.stringService.decoding(userForSupport.getName()));
         userForSupport.setDescription(this.stringService.decoding(userForSupport.getDescription()));

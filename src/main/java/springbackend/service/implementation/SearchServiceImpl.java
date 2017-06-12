@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.service.implementation;
 
 import org.slf4j.Logger;
@@ -106,7 +105,7 @@ public class SearchServiceImpl implements SearchService {
     public SearchRequest getEditedSearchRequest(SearchRequest sourceSearchRequest) {
         SearchRequest result = new SearchRequest();
         StringBuilder newSearchLine = new StringBuilder();
-        String[] wordsFromRequest = sourceSearchRequest.getSearchLine()
+        final String[] wordsFromRequest = sourceSearchRequest.getSearchLine()
                 .replaceAll(REGEX_FOR_REPLACE, "")
                 .split(REGEX_FOR_SPLIT);
 
@@ -116,12 +115,11 @@ public class SearchServiceImpl implements SearchService {
         ExactOccurrencesInTree occurrences = TreeSet::contains;
 
         Arrays.stream(wordsFromRequest).forEach(requestWord -> {
-            TreeSet<String> dictionaryContent = this.dictionary.getDictionaryContent();
+            final TreeSet<String> dictionaryContent = this.dictionary.getDictionaryContent();
             if (occurrences.isWordIncludingInTree(dictionaryContent, requestWord)) {
                 newSearchLine.append(requestWord);
             } else {
-                String oppositeWord
-                        = getStringByOppositeKeyboardLayout(requestWord);
+                final String oppositeWord = getStringByOppositeKeyboardLayout(requestWord);
                 if (occurrences.isWordIncludingInTree(dictionaryContent, oppositeWord)) {
                     newSearchLine.append(oppositeWord);
                 } else {
@@ -141,10 +139,10 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public TreeSet<Service> getResultServiceSet(SearchRequest searchRequest) {
-        TreeSet<Service> searchResults = new TreeSet<>(Comparator.comparing(Service::getServiceCost));
-        Set<Service> allServiceSet = this.serviceForService.findAll();
-
-        String searchLine = searchRequest.getSearchLine().replaceAll(REGEX_FOR_REPLACE, "");
+        TreeSet<Service> searchResults
+                = new TreeSet<>(Comparator.comparing(Service::getServiceCost));
+        final Set<Service> allServiceSet = this.serviceForService.findAll();
+        final String searchLine = searchRequest.getSearchLine().replaceAll(REGEX_FOR_REPLACE, "");
 
         Array arrayList = (string) -> {
             ArrayList<String> result = new ArrayList<>();
@@ -156,11 +154,10 @@ public class SearchServiceImpl implements SearchService {
             return result;
         };
 
-        String[] searchLineWords = searchLine.split(REGEX_FOR_SPLIT);
-
+        final String[] searchLineWords = searchLine.split(REGEX_FOR_SPLIT);
         searchResults.addAll(allServiceSet.stream()
                 .filter(service -> {
-                    /* Is category of current service equals with search request category? */
+                    // is category of current service equals with search request category?
                     boolean isServiceCategorySuitable =
                             searchRequest.getCategory().equals(CATEGORY_TYPE_ALL)
                                     || service.getCategory().equals(searchRequest.getCategory());
@@ -172,7 +169,7 @@ public class SearchServiceImpl implements SearchService {
                                             .contains(word.toLowerCase()) && isServiceCategorySuitable);
                 }).collect(Collectors.toSet()));
 
-        this.numberOFAllServices = searchResults.size();   // for isAlternativeSearchLineNeeded(...)
+        this.numberOFAllServices = searchResults.size();   // for method isAlternativeSearchLineNeeded(...)
 
         return searchResults;
     }
@@ -181,16 +178,15 @@ public class SearchServiceImpl implements SearchService {
     public ArrayList<String> getStringsForAutoComplete(SearchRequest searchRequest) throws IOException {
         ArrayList<String> result = new ArrayList<>();
 
-        Map<String, HashMap<String, Integer>> wordsWithDistance
+        final Map<String, HashMap<String, Integer>> wordsWithDistance
                 = getWordsWithMinimumDistance(searchRequest);
-
         for (int i = 0; i < 5; i++) {
-            String alternativeSearchLine = getAlternativeSearchLine(
+            final String alternativeSearchLine = getAlternativeSearchLine(
                     wordsWithDistance,
                     searchRequest);
             result.add(alternativeSearchLine);
 
-            /* Delete words from "wordsWithDistance.value" which are equal to some word from alternativeSearchLine */
+            // Delete words from "wordsWithDistance.value" which are equal to some word from alternativeSearchLine
             Arrays.stream(alternativeSearchLine.split(" ")).forEach(alternativeWord -> {
                 String wordsFromRequest[] = searchRequest.getSearchLine()
                         .replaceAll(REGEX_FOR_REPLACE, " ")
@@ -198,7 +194,8 @@ public class SearchServiceImpl implements SearchService {
 
                 Arrays.stream(wordsFromRequest).forEach(requestWord ->
                         wordsWithDistance.get(requestWord)
-                                .entrySet().removeIf(pair -> pair.getKey().equals(alternativeWord)));
+                                .entrySet()
+                                .removeIf(pair -> pair.getKey().equals(alternativeWord)));
             });
         }
 
@@ -209,10 +206,9 @@ public class SearchServiceImpl implements SearchService {
     public String getAlternativeSearchLine(Map<String, HashMap<String, Integer>> wordsWithDistance,
                                            SearchRequest searchRequest) {
         StringBuilder result = new StringBuilder();
-        String[] wordsFromRequest = searchRequest.getSearchLine().split(REGEX_FOR_SPLIT);
+        final String[] wordsFromRequest = searchRequest.getSearchLine().split(REGEX_FOR_SPLIT);
 
         Map<String, Integer> minDistanceMap = new HashMap<>();    //string - requestWord , Integer - distance
-
         Arrays.stream(wordsFromRequest).forEach(requestWord ->
                 minDistanceMap.put(requestWord,
                         wordsWithDistance.get(requestWord).values()
@@ -220,11 +216,11 @@ public class SearchServiceImpl implements SearchService {
                                 .orElse(-1)));
 
         Arrays.stream(wordsFromRequest).forEach(requestWord -> {
-            result.append(
-                    wordsWithDistance.get(requestWord).entrySet().stream()
-                            .filter(pair -> pair.getValue()
-                                    .equals(minDistanceMap.get(requestWord)))
-                            .findAny().get().getKey());
+            result.append(wordsWithDistance
+                    .get(requestWord).entrySet().stream()
+                    .filter(pair -> pair.getValue()
+                            .equals(minDistanceMap.get(requestWord)))
+                    .findAny().get().getKey());
 
             result.append(" ");
         });
@@ -250,9 +246,9 @@ public class SearchServiceImpl implements SearchService {
 
     @Override
     public Map<String, HashMap<String, Integer>> getWordsWithMinimumDistance(SearchRequest searchRequest) throws IOException {
-        String searchLine = searchRequest.getSearchLine();
+        final String searchLine = searchRequest.getSearchLine();
 
-        /* Map with words from request and with pair consisting distance and word from dictionary. */
+        // Map with words from request and with pair consisting distance and word from dictionary.
         Map<String, HashMap<String, Integer>> resultMap = new TreeMap<>(Comparator.naturalOrder());
 
         Distance distance = (dictString, userString) ->
@@ -301,7 +297,7 @@ public class SearchServiceImpl implements SearchService {
         });
 
         StringBuilder newSearchLine = new StringBuilder();
-        String[] arr = sourceString
+        final String[] arr = sourceString
                 .replaceAll(REGEX_FOR_REPLACE, "")
                 .split(REGEX_FOR_SPLIT);
         Arrays.stream(arr).forEach(word -> newSearchLine
@@ -317,10 +313,9 @@ public class SearchServiceImpl implements SearchService {
     public void initializeDictionary(Dictionary dictionary) {
         TreeSet<String> resultDictionaryContent = new TreeSet<>();
 
-        Set<Service> allServiceSet = this.serviceForService.findAll();
+        final Set<Service> allServiceSet = this.serviceForService.findAll();
         allServiceSet.forEach(service -> {
-            String[] texts = new String[]{
-                    service.getServiceName(), service.getDescription()};
+            String[] texts = new String[]{service.getServiceName(), service.getDescription()};
             Arrays.stream(texts).forEach(text ->
                     resultDictionaryContent.addAll(Arrays.stream(
                             text.toLowerCase().split(REGEX_FOR_SPLIT))

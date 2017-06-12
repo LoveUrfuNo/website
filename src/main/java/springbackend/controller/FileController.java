@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.controller;
 
 import org.slf4j.Logger;
@@ -24,7 +23,6 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 
 /**
  * Controller for operations with download files
@@ -69,9 +67,7 @@ public class FileController {
                     dir = new File(rootPath + "/images/for_services" + File.separator);
                 }
 
-                if (!dir.exists()) {
-                    dir.mkdirs();
-                }
+                if (!dir.exists()) dir.mkdirs();
 
                 uploadedFile = new File(dir.getAbsolutePath() + File.separator + name);
                 try (BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile))) {
@@ -89,7 +85,7 @@ public class FileController {
         }
 
         assert uploadedFile != null;
-        String path = uploadedFile.getAbsolutePath();
+        final String path = uploadedFile.getAbsolutePath();
         if (operation.contains("loadAvatar")) {
             currentUser.setAvatar(this.stringService.makePathForFile(path));
 

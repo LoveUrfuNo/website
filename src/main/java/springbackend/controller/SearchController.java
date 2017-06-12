@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.controller;
 
 import org.slf4j.Logger;
@@ -103,9 +102,9 @@ public class SearchController {
         }
 
         try {
-            String sourceSearchLineWithoutMultipleSpaces
+            final String sourceSearchLineWithoutMultipleSpaces
                     = searchRequest.getSearchLine().replaceAll(REGEX_FOR_REPLACE, " ");
-            String decodedSearchLine = new String(
+            final String decodedSearchLine = new String(
                     sourceSearchLineWithoutMultipleSpaces.getBytes("ISO-8859-1"),
                     "UTF-8");
 
@@ -124,7 +123,7 @@ public class SearchController {
         TreeSet<Service> finalSearchResults
                 = this.searchService.getResultServiceSet(editedSearchRequest);
 
-        boolean isNewSearchRequestEqualOriginal =
+        final boolean isNewSearchRequestEqualOriginal =
                 Arrays.equals(editedSearchRequest.getSearchLine().split(REGEX_FOR_SPLIT),
                         searchRequest.getSearchLine().split(REGEX_FOR_SPLIT));
 
@@ -139,10 +138,10 @@ public class SearchController {
                 return "redirect";     //TODO: add message in jsp with information about error
             }
 
-            String alternativeSearchLine = this.searchService.getAlternativeSearchLine(
+            final String alternativeSearchLine = this.searchService.getAlternativeSearchLine(
                     wordsWithDistance, editedSearchRequest);
 
-            boolean isAlternativeSearchLineNeeded
+            final boolean isAlternativeSearchLineNeeded
                     = alternativeSearchLine.equalsIgnoreCase(editedSearchRequest.getSearchLine())
                     || this.searchService.isAlternativeSearchLineNeeded(
                             finalSearchResults.size(), searchRequest.getCategory());

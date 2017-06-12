@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +54,8 @@ public class ServiceController {
     public String addService(@ModelAttribute(value = "serviceForm") Service service,
                              BindingResult bindingResult) {
         this.serviceValidator.validate(service, bindingResult);
-        if (bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors())
             return "add-service";
-        }
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = this.userService.findByUsername(auth.getName());
@@ -101,13 +99,13 @@ public class ServiceController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User user = this.userService.findByUsername(auth.getName());
         user.getServices().sort(
-                (o1, o2) -> o1.getServiceName().compareToIgnoreCase(o2.getServiceName()));
+                (s1, s2) -> s1.getServiceName().compareToIgnoreCase(s2.getServiceName()));
 
         Map<String, Set<UserFile>> fileMap = new HashMap<>();
 
         Set<UserFile> allSet = this.userFileService.findAllByUserId(user.getId());
-        allSet.forEach(t -> fileMap.put(t.getServiceName(),
-                new HashSet<>(this.userFileService.findAllByServiceName(t.getServiceName()))));
+        allSet.forEach(f -> fileMap.put(f.getServiceName(),
+                new HashSet<>(this.userFileService.findAllByServiceName(f.getServiceName()))));
 
         model.addAttribute("files", fileMap);
         model.addAttribute("user", user);
@@ -125,7 +123,7 @@ public class ServiceController {
             this.serviceForService.delete(service);
 
             this.userFileService.findAllByUserId(user.getId()).stream()
-                    .filter(t -> t.getServiceName().equals(service.getServiceName()))
+                    .filter(f -> f.getServiceName().equals(service.getServiceName()))
                     .forEach(temp -> this.userFileService.delete(temp));
         } else {
             return "error-page";

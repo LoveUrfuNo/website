@@ -1,3 +1,6 @@
+/*
+ * Copyright (C) 2017 The Open Source Project
+ */
 package springbackend.model;
 
 import java.io.Serializable;

@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.validator;
 
 import org.springframework.beans.factory.annotation.Autowired;

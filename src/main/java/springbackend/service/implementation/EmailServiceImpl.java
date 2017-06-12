@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2017 The Open Source Project
  */
-
 package springbackend.service.implementation;
 
 import org.apache.velocity.app.VelocityEngine;
@@ -40,10 +39,9 @@ public class EmailServiceImpl implements EmailService{
         boolean result = false;
         try {
             MimeMessagePreparator preparator = (mimeMessage) -> {
-
-                String from = (String) model.get(FROM);
-                String to = (String) model.get(TO);
-                String subject = (String) model.get(SUBJECT);
+                final String from = (String) model.get(FROM);
+                final String to = (String) model.get(TO);
+                final String subject = (String) model.get(SUBJECT);
 
                 MimeMessageHelper message = new MimeMessageHelper(mimeMessage, "UTF-8");
                 message.setFrom(from);
@@ -51,7 +49,7 @@ public class EmailServiceImpl implements EmailService{
                 message.setSubject(subject);
                 message.setSentDate(new Date());
 
-                String text = VelocityEngineUtils.mergeTemplateIntoString(
+                final String text = VelocityEngineUtils.mergeTemplateIntoString(
                         this.velocityEngine, templateName, "UTF-8", model);
 
                 message.setText(text, true);
@@ -59,7 +57,6 @@ public class EmailServiceImpl implements EmailService{
 
             this.mailSender.send(preparator);
             result = true;
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,13 +65,13 @@ public class EmailServiceImpl implements EmailService{
     }
 
     public String generateString(int length) {
-        String characters = "qwertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOASDFGHJKLZXCVBNM";
+        final String characters = "qwertyuiopasdfghjklzxcvbnm1234567890QWERTYUIOASDFGHJKLZXCVBNM";
         Random random = new Random();
         char[] text = new char[length];
-
         for (int i = 0; i < length; i++) {
             text[i] = characters.charAt(random.nextInt(characters.length()));
         }
+
         return new String(text);
     }
 }
